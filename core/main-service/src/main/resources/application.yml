@@ -6,35 +6,52 @@ spring:
     name: main-service
 
   config:
-    import: "configserver:"
+    import: "${CONFIG_IMPORT:optional:configserver:http://localhost:8888}"
 
   cloud:
     config:
-      fail-fast: true
-
       discovery:
-        enabled: true
+        enabled: false
         service-id: config-server
 
-      retry:
-        initial-interval: 500
-        max-attempts: 20
-        max-interval: 1500
-        multiplier: 1.2
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/ewm}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
 
-      request-connect-timeout: 2000
-      request-read-timeout: 5000
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        format_sql: true
+
+  sql:
+    init:
+      mode: always
 
 eureka:
   client:
+    register-with-eureka: true
+    fetch-registry: true
+
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
-
-    registry-fetch-interval-seconds: 3
-    initial-instance-info-replication-interval-seconds: 3
-    instance-info-replication-interval-seconds: 5
 
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${random.value}
-    lease-renewal-interval-in-seconds: 5
+
+app:
+  name: ewm-main-service
+
+stats-service:
+  id: stats-server
+
+logging:
+  level:
+    ru.practicum.ewm: DEBUG
+    org.hibernate.SQL: DEBUG
