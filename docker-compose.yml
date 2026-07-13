@@ -2,227 +2,140 @@ services:
   discovery-server:
     build:
       context: ./infra/discovery-server
-
     container_name: discovery-server
-    restart: on-failure
-
     ports:
       - "8761:8761"
-
     environment:
-      SERVER_PORT: "8761"
-      SERVER_ADDRESS: "0.0.0.0"
+      SERVER_PORT: 8761
       SPRING_APPLICATION_NAME: discovery-server
-
     healthcheck:
-      test:
-        - CMD-SHELL
-        - bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8761'
-      interval: 2s
-      timeout: 2s
+      test: [ "CMD-SHELL", "curl --fail --silent http://localhost:8761/actuator/health | grep UP" ]
+      interval: 5s
+      timeout: 5s
       retries: 30
-      start_period: 10s
-
+      start_period: 15s
 
   config-server:
     build:
       context: ./infra/config-server
-
     container_name: config-server
-    restart: on-failure
-
     depends_on:
       discovery-server:
         condition: service_healthy
-
     expose:
       - "8888"
-
     environment:
-      SERVER_PORT: "8888"
-      SERVER_ADDRESS: "0.0.0.0"
+      SERVER_PORT: 8888
       SPRING_APPLICATION_NAME: config-server
       SPRING_PROFILES_ACTIVE: native
-
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discovery-server:8761/eureka/"
-
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
     healthcheck:
-      test:
-        - CMD-SHELL
-        - bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8888'
-      interval: 2s
-      timeout: 2s
+      test: [ "CMD-SHELL", "curl --fail --silent http://localhost:8888/actuator/health | grep UP" ]
+      interval: 5s
+      timeout: 5s
       retries: 30
-      start_period: 15s
-
+      start_period: 20s
 
   stats-db:
     image: postgres:16.1
-
     container_name: stats-db
-    restart: unless-stopped
-
     environment:
       POSTGRES_DB: stats
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-
-    volumes:
-      - stats-db-data:/var/lib/postgresql/data
-
+    expose:
+      - "5432"
     healthcheck:
-      test:
-        - CMD-SHELL
-        - pg_isready -q -d stats -U postgres
-      interval: 3s
-      timeout: 3s
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d stats" ]
+      interval: 5s
+      timeout: 5s
       retries: 30
-      start_period: 5s
-
-
-  stats-server:
-    build:
-      context: ./stats-service/stats-server
-
-    container_name: stats-server
-    restart: on-failure
-
-    depends_on:
-      stats-db:
-        condition: service_healthy
-      config-server:
-        condition: service_healthy
-
-    ports:
-      - "9090:9090"
-
-    environment:
-      SERVER_PORT: "9090"
-      SERVER_ADDRESS: "0.0.0.0"
-      SPRING_APPLICATION_NAME: stats-server
-
-      SPRING_CONFIG_IMPORT: "optional:configserver:"
-      SPRING_CLOUD_CONFIG_DISCOVERY_ENABLED: "true"
-      SPRING_CLOUD_CONFIG_DISCOVERY_SERVICE_ID: config-server
-
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discovery-server:8761/eureka/"
-
-      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/stats
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - bash -ec 'exec 3<>/dev/tcp/127.0.0.1/9090'
-      interval: 2s
-      timeout: 2s
-      retries: 30
-      start_period: 20s
-
 
   ewm-db:
     image: postgres:16.1
-
     container_name: ewm-db
-    restart: unless-stopped
-
     environment:
       POSTGRES_DB: ewm
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-
-    volumes:
-      - ewm-db-data:/var/lib/postgresql/data
-
+    expose:
+      - "5432"
     healthcheck:
-      test:
-        - CMD-SHELL
-        - pg_isready -q -d ewm -U postgres
-      interval: 3s
-      timeout: 3s
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d ewm" ]
+      interval: 5s
+      timeout: 5s
       retries: 30
-      start_period: 5s
 
+  stats-server:
+    build:
+      context: ./stats-service/stats-server
+    container_name: stats-server
+    depends_on:
+      config-server:
+        condition: service_healthy
+      stats-db:
+        condition: service_healthy
+    expose:
+      - "9090"
+    environment:
+      SERVER_PORT: 9090
+      SPRING_APPLICATION_NAME: stats-server
+      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/stats
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail --silent http://localhost:9090/actuator/health | grep UP" ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
 
   ewm-service:
     build:
       context: ./core/main-service
-
     container_name: ewm-service
-    restart: on-failure
-
     depends_on:
-      ewm-db:
-        condition: service_healthy
       config-server:
         condition: service_healthy
-
+      ewm-db:
+        condition: service_healthy
+      stats-server:
+        condition: service_healthy
     expose:
       - "8081"
-
     environment:
-      SERVER_PORT: "8081"
-      SERVER_ADDRESS: "0.0.0.0"
+      SERVER_PORT: 8081
       SPRING_APPLICATION_NAME: main-service
-
-      SPRING_CONFIG_IMPORT: "optional:configserver:"
-      SPRING_CLOUD_CONFIG_DISCOVERY_ENABLED: "true"
-      SPRING_CLOUD_CONFIG_DISCOVERY_SERVICE_ID: config-server
-
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discovery-server:8761/eureka/"
-
       SPRING_DATASOURCE_URL: jdbc:postgresql://ewm-db:5432/ewm
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
     healthcheck:
-      test:
-        - CMD-SHELL
-        - bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8081'
-      interval: 2s
-      timeout: 2s
+      test: [ "CMD-SHELL", "curl --fail --silent http://localhost:8081/actuator/health | grep UP" ]
+      interval: 5s
+      timeout: 5s
       retries: 30
-      start_period: 20s
-
+      start_period: 40s
 
   gateway-server:
     build:
       context: ./infra/gateway-server
-
     container_name: gateway-server
-    restart: on-failure
-
     depends_on:
       config-server:
         condition: service_healthy
       ewm-service:
         condition: service_healthy
-
     ports:
       - "8080:8080"
-
     environment:
-      SERVER_PORT: "8080"
-      SERVER_ADDRESS: "0.0.0.0"
+      SERVER_PORT: 8080
       SPRING_APPLICATION_NAME: gateway-server
-
-      SPRING_CONFIG_IMPORT: "optional:configserver:"
-      SPRING_CLOUD_CONFIG_DISCOVERY_ENABLED: "true"
-      SPRING_CLOUD_CONFIG_DISCOVERY_SERVICE_ID: config-server
-
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discovery-server:8761/eureka/"
-
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
     healthcheck:
-      test:
-        - CMD-SHELL
-        - bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8080'
-      interval: 2s
-      timeout: 2s
+      test: [ "CMD-SHELL", "curl --fail --silent http://localhost:8080/actuator/health | grep UP" ]
+      interval: 5s
+      timeout: 5s
       retries: 30
-      start_period: 20s
-
-
-volumes:
-  stats-db-data:
-  ewm-db-data:
+      start_period: 30s

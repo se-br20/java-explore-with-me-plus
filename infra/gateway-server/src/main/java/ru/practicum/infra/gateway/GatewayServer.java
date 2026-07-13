@@ -7,9 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class GatewayServer {
 
     public static void main(String[] args) {
-        SpringApplication.run(
-                GatewayServer.class,
-                args
-        );
+        SpringApplication.run(GatewayServer.class, args);
     }
 }

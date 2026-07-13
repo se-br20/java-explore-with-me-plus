@@ -1,5 +1,5 @@
 server:
-  port: 8761
+  port: ${SERVER_PORT:8761}
 
 spring:
   application:
@@ -11,5 +11,14 @@ eureka:
     fetch-registry: false
 
   server:
-    response-cache-update-interval-ms: 1000
+    enable-self-preservation: false
     eviction-interval-timer-in-ms: 5000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

@@ -1,4 +1,10 @@
+server:
+  port: ${SERVER_PORT:0}
+
 spring:
+  application:
+    name: stats-server
+
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/stats}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
@@ -8,12 +14,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-
-    show-sql: false
-    open-in-view: false
-
+    show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-
     properties:
       hibernate:
         format_sql: true
@@ -22,7 +24,26 @@ spring:
     init:
       mode: always
 
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
+
 logging:
   level:
     ru.practicum.stats: DEBUG
-    org.hibernate.SQL: WARN
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
