@@ -1,27 +1,40 @@
 package ru.practicum.ewm.request.model;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.user.model.User;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "requests", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"event_id", "requester_id"})
-})
-@Builder
+@Table(name = "requests")
 @Getter
 @Setter
-@ToString(onlyExplicitlyIncluded = true)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ParticipationRequest {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "created", nullable = false)
     private LocalDateTime created;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,7 +46,6 @@ public class ParticipationRequest {
     private User requester;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private RequestStatus status;
-
 }
