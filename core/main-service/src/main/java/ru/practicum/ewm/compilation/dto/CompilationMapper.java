@@ -39,4 +39,5 @@ public final class CompilationMapper {
                 .map(id -> Event.builder().id(id).build())
                 .toList();
     }
+
 }

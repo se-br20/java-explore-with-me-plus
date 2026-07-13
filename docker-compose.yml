@@ -84,6 +84,7 @@ services:
     environment:
       SERVER_PORT: "9090"
       SPRING_APPLICATION_NAME: stats-server
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888/
       SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/stats
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
@@ -116,6 +117,7 @@ services:
     environment:
       SERVER_PORT: "8081"
       SPRING_APPLICATION_NAME: main-service
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888/
       SPRING_DATASOURCE_URL: jdbc:postgresql://ewm-db:5432/ewm
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
@@ -147,6 +149,7 @@ services:
     environment:
       SERVER_PORT: "8080"
       SPRING_APPLICATION_NAME: gateway-server
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
 
     healthcheck:
