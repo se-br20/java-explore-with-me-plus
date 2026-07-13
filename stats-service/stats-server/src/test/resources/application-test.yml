@@ -18,7 +18,7 @@ spring:
       enabled: false
 
   datasource:
-    url: jdbc:h2:mem:stats;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    url: jdbc:h2:mem:stats-${random.uuid};MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -28,6 +28,7 @@ spring:
       ddl-auto: none
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: false
+    open-in-view: false
 
   sql:
     init:
