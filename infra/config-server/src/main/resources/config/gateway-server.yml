@@ -1,0 +1,48 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+
+      routes:
+        - id: main-service-events
+          uri: lb://main-service
+          predicates:
+            - Path=/events/**
+
+        - id: main-service-admin
+          uri: lb://main-service
+          predicates:
+            - Path=/admin/**
+
+        - id: main-service-users
+          uri: lb://main-service
+          predicates:
+            - Path=/users/**
+
+        - id: main-service-categories
+          uri: lb://main-service
+          predicates:
+            - Path=/categories/**
+
+        - id: main-service-compilations
+          uri: lb://main-service
+          predicates:
+            - Path=/compilations/**
+
+        - id: main-service-comments
+          uri: lb://main-service
+          predicates:
+            - Path=/comments/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+
+  instance:
+    instance-id: ${spring.application.name}:${random.value}

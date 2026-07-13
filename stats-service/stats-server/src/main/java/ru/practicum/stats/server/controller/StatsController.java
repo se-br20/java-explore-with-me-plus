@@ -45,7 +45,11 @@ public class StatsController {
         }
 
         if (end.isBefore(start)) {
-            throw new ValidationException("start", start, "stаrt should be BEFORE end");
+            throw new ValidationException(
+                    "start",
+                    start,
+                    "start should be before end"
+            );
         }
         return statsService.getStats(start, end, uris, unique);
     }

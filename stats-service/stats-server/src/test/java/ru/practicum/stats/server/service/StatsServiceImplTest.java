@@ -81,8 +81,6 @@ class StatsServiceImplTest {
         when(repository.save(any(EndpointHit.class))).thenThrow(new RuntimeException("Database error"));
 
         assertThrows(RuntimeException.class, () -> statsService.saveHit(hitDto));
-
-        // попытка сохранить данные была, т.е. исключение возникло после вызова save
         verify(repository, times(1)).save(any(EndpointHit.class));
     }
 

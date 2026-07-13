@@ -17,7 +17,15 @@ spring:
   sql:
     init:
       mode: never
+  cloud:
+    config:
+          enabled: false
 
 logging:
   level:
     org.hibernate.SQL: WARN
+
+
+eureka:
+  client:
+    enabled: false

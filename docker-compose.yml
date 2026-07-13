@@ -1,4 +1,21 @@
 services:
+  discovery-server:
+    build: ./infra/discovery-server
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+    environment:
+      SERVER_PORT: 8761
+    restart: on-failure
+
+  config-server:
+    build: ./infra/config-server
+    container_name: config-server
+    depends_on:
+      - discovery-server
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    restart: on-failure
 
   stats-db:
     image: postgres:16.1
@@ -8,11 +25,12 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     healthcheck:
-      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
-      timeout: 5s
+      test:
+        - CMD-SHELL
+        - pg_isready -q -d stats -U postgres
       interval: 5s
-      retries: 10
-
+      timeout: 5s
+      retries: 20
 
   stats-server:
     build: ./stats-service/stats-server
@@ -20,12 +38,16 @@ services:
     depends_on:
       stats-db:
         condition: service_healthy
-    ports:
-      - "9090:9090"
+      discovery-server:
+        condition: service_started
+      config-server:
+        condition: service_started
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stats
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/stats
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    restart: on-failure
 
   ewm-db:
     image: postgres:16.1
@@ -35,21 +57,44 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     healthcheck:
-      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
-      timeout: 5s
+      test:
+        - CMD-SHELL
+        - pg_isready -q -d ewm -U postgres
       interval: 5s
-      retries: 10
+      timeout: 5s
+      retries: 20
 
-  ewm-service:
-    build: ./ewm-service
-    container_name: ewm-service
+  main-service:
+    build: ./core/main-service
+    container_name: main-service
     depends_on:
-      - ewm-db
-      - stats-server
+      ewm-db:
+        condition: service_healthy
+      discovery-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+      stats-server:
+        condition: service_started
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:postgresql://ewm-db:5432/ewm
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    restart: on-failure
+
+  gateway-server:
+    build: ./infra/gateway-server
+    container_name: gateway-server
+    depends_on:
+      discovery-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+      main-service:
+        condition: service_started
     ports:
       - "8080:8080"
     environment:
-      - STATS_SERVER_URL=http://stats-server:9090
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    restart: on-failure
