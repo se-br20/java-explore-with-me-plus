@@ -1,5 +1,5 @@
 server:
-  port: ${SERVER_PORT:0}
+  port: ${SERVER_PORT:9090}
 
 spring:
   application:
@@ -35,15 +35,17 @@ eureka:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${random.value}
 
-logging:
-  level:
-    ru.practicum.stats: DEBUG
-
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+
   endpoint:
     health:
       show-details: always
+
+logging:
+  level:
+    ru.practicum.stats: DEBUG
+    org.hibernate.SQL: DEBUG

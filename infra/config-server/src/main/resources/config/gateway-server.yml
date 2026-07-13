@@ -7,8 +7,13 @@ spring:
 
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
       routes:
-        - id: main-service-route
+        - id: main-service
           uri: lb://main-service
           predicates:
             - Path=/admin/**,/users/**,/events/**,/categories/**,/compilations/**
@@ -29,6 +34,7 @@ management:
     web:
       exposure:
         include: health,info,gateway
+
   endpoint:
     health:
       show-details: always

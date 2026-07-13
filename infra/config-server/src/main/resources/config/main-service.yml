@@ -1,5 +1,5 @@
 server:
-  port: ${SERVER_PORT:0}
+  port: ${SERVER_PORT:8081}
 
 spring:
   application:
@@ -39,18 +39,19 @@ app:
   name: ewm-main-service
 
 stats-service:
-  id: stats-server
-
-logging:
-  level:
-    ru.practicum.ewm: DEBUG
-    org.hibernate.SQL: DEBUG
+  id: ${STATS_SERVICE_ID:stats-server}
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+
   endpoint:
     health:
       show-details: always
+
+logging:
+  level:
+    ru.practicum.ewm: DEBUG
+    org.hibernate.SQL: DEBUG
