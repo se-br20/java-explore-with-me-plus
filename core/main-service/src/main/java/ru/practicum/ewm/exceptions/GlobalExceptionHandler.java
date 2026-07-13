@@ -43,7 +43,10 @@ public class GlobalExceptionHandler {
                         .getFieldErrors()
         );
 
-        log.warn("Request body validation error: {}", message);
+        log.warn(
+                "Request body validation error: {}",
+                message
+        );
 
         return buildError(
                 HttpStatus.BAD_REQUEST,
@@ -51,6 +54,7 @@ public class GlobalExceptionHandler {
                 message
         );
     }
+
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleBindException(
@@ -61,7 +65,10 @@ public class GlobalExceptionHandler {
                         .getFieldErrors()
         );
 
-        log.warn("Request parameters validation error: {}", message);
+        log.warn(
+                "Request parameters validation error: {}",
+                message
+        );
 
         return buildError(
                 HttpStatus.BAD_REQUEST,
@@ -69,6 +76,7 @@ public class GlobalExceptionHandler {
                 message
         );
     }
+
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleValidationException(
@@ -81,7 +89,10 @@ public class GlobalExceptionHandler {
                 exception.getRejectedValue()
         );
 
-        log.warn("Validation error: {}", message);
+        log.warn(
+                "Validation error: {}",
+                message
+        );
 
         return buildError(
                 HttpStatus.BAD_REQUEST,
@@ -89,6 +100,7 @@ public class GlobalExceptionHandler {
                 message
         );
     }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleDataIntegrityViolation(
@@ -98,7 +110,10 @@ public class GlobalExceptionHandler {
                 exception.getMostSpecificCause()
                         .getMessage();
 
-        log.warn("Database integrity violation: {}", message);
+        log.warn(
+                "Database integrity violation: {}",
+                message
+        );
 
         return buildError(
                 HttpStatus.CONFLICT,
@@ -106,6 +121,7 @@ public class GlobalExceptionHandler {
                 message
         );
     }
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleConstraintViolation(
@@ -126,7 +142,10 @@ public class GlobalExceptionHandler {
                                 Collectors.joining("; ")
                         );
 
-        log.warn("Constraint violation: {}", message);
+        log.warn(
+                "Constraint violation: {}",
+                message
+        );
 
         return buildError(
                 HttpStatus.BAD_REQUEST,
@@ -134,9 +153,8 @@ public class GlobalExceptionHandler {
                 message
         );
     }
-    @ExceptionHandler(
-            MethodArgumentTypeMismatchException.class
-    )
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleMethodArgumentTypeMismatch(
             MethodArgumentTypeMismatchException exception
@@ -152,9 +170,8 @@ public class GlobalExceptionHandler {
                 exception.getMessage()
         );
     }
-    @ExceptionHandler(
-            HttpMessageNotReadableException.class
-    )
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleHttpMessageNotReadable(
             HttpMessageNotReadableException exception
@@ -171,9 +188,7 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(
-            MissingServletRequestParameterException.class
-    )
+    @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleMissingServletRequestParameter(
             MissingServletRequestParameterException exception
