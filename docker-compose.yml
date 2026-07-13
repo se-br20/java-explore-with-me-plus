@@ -10,6 +10,7 @@ services:
 
     environment:
       SERVER_PORT: "8761"
+      SERVER_ADDRESS: "0.0.0.0"
       SPRING_APPLICATION_NAME: discovery-server
 
     healthcheck:
@@ -37,6 +38,7 @@ services:
 
     environment:
       SERVER_PORT: "8888"
+      SERVER_ADDRESS: "0.0.0.0"
       SPRING_APPLICATION_NAME: config-server
       SPRING_PROFILES_ACTIVE: native
 
@@ -92,6 +94,7 @@ services:
 
     environment:
       SERVER_PORT: "9090"
+      SERVER_ADDRESS: "0.0.0.0"
       SPRING_APPLICATION_NAME: stats-server
 
       CONFIG_IMPORT: "configserver:http://config-server:8888"
@@ -155,6 +158,7 @@ services:
 
     environment:
       SERVER_PORT: "8081"
+      SERVER_ADDRESS: "0.0.0.0"
       SPRING_APPLICATION_NAME: main-service
 
       CONFIG_IMPORT: "configserver:http://config-server:8888"
@@ -193,6 +197,7 @@ services:
 
     environment:
       SERVER_PORT: "8080"
+      SERVER_ADDRESS: "0.0.0.0"
       SPRING_APPLICATION_NAME: gateway-server
 
       CONFIG_IMPORT: "configserver:http://config-server:8888"
