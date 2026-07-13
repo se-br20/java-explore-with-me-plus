@@ -6,18 +6,35 @@ spring:
     name: gateway-server
 
   config:
-    import: "optional:configserver:"
+    import: "configserver:"
 
   cloud:
     config:
+      fail-fast: true
+
       discovery:
         enabled: true
         service-id: config-server
+
+      retry:
+        initial-interval: 500
+        max-attempts: 20
+        max-interval: 1500
+        multiplier: 1.2
+
+      request-connect-timeout: 2000
+      request-read-timeout: 5000
 
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
 
+    registry-fetch-interval-seconds: 3
+    initial-instance-info-replication-interval-seconds: 3
+    instance-info-replication-interval-seconds: 5
+
   instance:
+    prefer-ip-address: true
     instance-id: ${spring.application.name}:${random.value}
+    lease-renewal-interval-in-seconds: 5

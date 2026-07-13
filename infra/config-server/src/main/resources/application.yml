@@ -12,12 +12,21 @@ spring:
     config:
       server:
         native:
-          search-locations: classpath:/config
+          search-locations:
+            - classpath:/config
 
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
 
+    register-with-eureka: true
+    fetch-registry: false
+
+    initial-instance-info-replication-interval-seconds: 3
+    instance-info-replication-interval-seconds: 5
+
   instance:
+    prefer-ip-address: true
     instance-id: ${spring.application.name}:${random.value}
+    lease-renewal-interval-in-seconds: 5
