@@ -1,6 +1,3 @@
-server:
-  port: 8080
-
 spring:
   cloud:
     gateway:
@@ -39,17 +36,20 @@ spring:
           predicates:
             - Path=/comments/**
 
-logging:
-  level:
-    org.springframework.cloud.gateway: DEBUG
-    org.springframework.cloud.loadbalancer: DEBUG
-
 management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health,gateway
 
   endpoint:
     health:
       show-details: never
+
+    gateway:
+      access: read-only
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG

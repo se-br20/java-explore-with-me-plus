@@ -30,8 +30,11 @@ management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health,gateway
 
   endpoint:
     health:
       show-details: never
+
+    gateway:
+      access: read-only
