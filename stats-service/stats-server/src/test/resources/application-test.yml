@@ -1,31 +1,50 @@
+server:
+  port: 0
+
 spring:
+  application:
+    name: stats-server-test
+
+  config:
+    import: "optional:configserver:"
+
+  cloud:
+    config:
+      enabled: false
+      discovery:
+        enabled: false
+
+    discovery:
+      enabled: false
+
   datasource:
-    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
-    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:stats;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
     username: sa
     password:
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: false
-    properties:
-      hibernate:
-        format_sql: false
 
   sql:
     init:
-      mode: never
-  cloud:
-    config:
-          enabled: false
-
-logging:
-  level:
-    org.hibernate.SQL: WARN
-
+      mode: always
 
 eureka:
   client:
     enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+management:
+  health:
+    config:
+      enabled: false
+
+logging:
+  level:
+    com.netflix.discovery: OFF
+    org.springframework.cloud.config: OFF

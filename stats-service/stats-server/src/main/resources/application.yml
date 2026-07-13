@@ -6,7 +6,7 @@ spring:
     name: stats-server
 
   config:
-    import: "configserver:"
+    import: "optional:configserver:"
 
   cloud:
     config:
