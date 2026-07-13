@@ -47,16 +47,4 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
         log.info("Deleted user with id: {}", userId);
     }
-
-    // toDo удалить в конце
-
-    //    public List<UserDto> findBy(UserParam param){
-//        Specification<User> spec = new UserSpecification(param);
-//        Page<User> page = userRepository.findAll(spec, param.getPageable());
-//        HashMap<User, Integer> views = new HashMap<>(); // через клиента
-//        List<UserDto> dto = userMapper.toDto(page.getContent(), views);
-//        return dto;
-//    }
-
-
 }

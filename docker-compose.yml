@@ -34,7 +34,7 @@ services:
         condition: service_healthy
 
     expose:
-      - "8888"
+      - "8888:8888"
 
     environment:
       SERVER_PORT: "8888"
@@ -184,22 +184,21 @@ services:
     container_name: gateway-server
     restart: on-failure
 
+    network_mode: host
+
     depends_on:
       config-server:
         condition: service_healthy
-
-    ports:
-      - "8080:8080"
 
     environment:
       SERVER_PORT: "8080"
       SERVER_ADDRESS: "0.0.0.0"
       SPRING_APPLICATION_NAME: gateway-server
 
-      CONFIG_IMPORT: "configserver:http://config-server:8888"
+      CONFIG_IMPORT: "configserver:http://localhost:8888"
       SPRING_CLOUD_CONFIG_DISCOVERY_ENABLED: "false"
 
-      SPRING_APPLICATION_JSON: '{"eureka":{"client":{"serviceUrl":{"defaultZone":"http://discovery-server:8761/eureka/"}}}}'
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://localhost:8761/eureka/"
 
     healthcheck:
       test:

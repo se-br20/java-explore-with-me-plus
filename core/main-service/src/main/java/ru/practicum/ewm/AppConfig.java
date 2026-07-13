@@ -18,13 +18,11 @@ public class AppConfig {
         this.entityManager = entityManager;
     }
 
-    // бин JPAQueryFactory для QueryDSL
     @Bean
     public JPAQueryFactory jpaQueryFactory() {
         return new JPAQueryFactory(entityManager);
     }
 
-    // бин RestTemplate для StatsClient
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder
@@ -33,12 +31,4 @@ public class AppConfig {
                 .build();
     }
 
-    // Если хотите, можно сразу создать и бин StatsClient
-    /*
-    @Bean
-    public StatsClient statsClient(RestTemplate restTemplate,
-                                   @Value("${stats-server.url}") String url) {
-        return new StatsClient(restTemplate, url);
-    }
-    */
 }
