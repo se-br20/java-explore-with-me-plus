@@ -1,7 +1,6 @@
 package ru.practicum.stat.client;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -21,7 +20,6 @@ import ru.practicum.stat.dto.ViewStatsDto;
 import java.net.URI;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -29,8 +27,11 @@ import static org.springframework.http.HttpMethod.POST;
 @Slf4j
 @Component
 public class StatsClient {
+
     private static final DateTimeFormatter FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            DateTimeFormatter.ofPattern(
+                    "yyyy-MM-dd HH:mm:ss"
+            );
 
     private final RestTemplate restTemplate;
     private final DiscoveryClient discoveryClient;
@@ -40,12 +41,14 @@ public class StatsClient {
 
     public StatsClient(
             RestTemplate restTemplate,
-            ObjectProvider<DiscoveryClient> discoveryClientProvider,
-            @Value("${stats-service.id:stats-server}") String statsServiceId,
-            @Value("${app.name:ewm-main-service}") String appName
+            DiscoveryClient discoveryClient,
+            @Value("${stats-service.id:stats-server}")
+            String statsServiceId,
+            @Value("${app.name:ewm-main-service}")
+            String appName
     ) {
         this.restTemplate = restTemplate;
-        this.discoveryClient = discoveryClientProvider.getIfAvailable();
+        this.discoveryClient = discoveryClient;
         this.statsServiceId = statsServiceId;
         this.appName = appName;
         this.retryTemplate = createRetryTemplate();
@@ -56,13 +59,21 @@ public class StatsClient {
 
         try {
             URI uri = makeUri("/hit");
-            HttpEntity<EndpointHitDto> request = new HttpEntity<>(endpointHit);
 
-            restTemplate.exchange(uri, POST, request, Void.class);
+            HttpEntity<EndpointHitDto> request =
+                    new HttpEntity<>(endpointHit);
+
+            restTemplate.exchange(
+                    uri,
+                    POST,
+                    request,
+                    Void.class
+            );
         } catch (RuntimeException exception) {
             log.warn(
-                    "Не удалось сохранить обращение в stats-server: {}",
-                    exception.getMessage()
+                    "Не удалось сохранить обращение "
+                            + "в stats-server",
+                    exception
             );
         }
     }
@@ -71,25 +82,45 @@ public class StatsClient {
         if (paramDto == null
                 || paramDto.getStart() == null
                 || paramDto.getEnd() == null) {
-            log.warn("Невозможно запросить статистику: не заданы start или end");
+            log.warn(
+                    "Невозможно запросить статистику: "
+                            + "не заданы start или end"
+            );
+
             return List.of();
         }
 
         try {
-            UriComponentsBuilder builder = UriComponentsBuilder
-                    .fromUri(makeUri("/stats"))
-                    .queryParam("start", paramDto.getStart().format(FORMATTER))
-                    .queryParam("end", paramDto.getEnd().format(FORMATTER))
-                    .queryParam(
-                            "unique",
-                            Boolean.TRUE.equals(paramDto.getUnique())
-                    );
+            UriComponentsBuilder builder =
+                    UriComponentsBuilder
+                            .fromUri(makeUri("/stats"))
+                            .queryParam(
+                                    "start",
+                                    paramDto.getStart()
+                                            .format(FORMATTER)
+                            )
+                            .queryParam(
+                                    "end",
+                                    paramDto.getEnd()
+                                            .format(FORMATTER)
+                            )
+                            .queryParam(
+                                    "unique",
+                                    Boolean.TRUE.equals(
+                                            paramDto.getUnique()
+                                    )
+                            );
 
-            if (paramDto.getUris() != null && paramDto.getUris().length > 0) {
-                builder.queryParam("uris", (Object[]) paramDto.getUris());
+            if (paramDto.getUris() != null
+                    && paramDto.getUris().length > 0) {
+                builder.queryParam(
+                        "uris",
+                        (Object[]) paramDto.getUris()
+                );
             }
 
-            URI uri = builder.build()
+            URI uri = builder
+                    .build()
                     .encode()
                     .toUri();
 
@@ -102,20 +133,27 @@ public class StatsClient {
                             }
                     );
 
-            return response.getBody() != null
-                    ? response.getBody()
-                    : List.of();
+            if (response.getBody() == null) {
+                return List.of();
+            }
+
+            return response.getBody();
         } catch (RuntimeException exception) {
             log.warn(
-                    "Не удалось получить статистику из stats-server: {}",
-                    exception.getMessage()
+                    "Не удалось получить статистику "
+                            + "из stats-server",
+                    exception
             );
+
             return List.of();
         }
     }
 
     private URI makeUri(String path) {
-        ServiceInstance instance = retryTemplate.execute(context -> getInstance());
+        ServiceInstance instance =
+                retryTemplate.execute(
+                        context -> getInstance()
+                );
 
         return UriComponentsBuilder
                 .fromUri(instance.getUri())
@@ -125,35 +163,42 @@ public class StatsClient {
     }
 
     private ServiceInstance getInstance() {
-        if (discoveryClient == null) {
-            throw new IllegalStateException(
-                    "DiscoveryClient недоступен. Невозможно найти " + statsServiceId
-            );
-        }
-
         List<ServiceInstance> instances =
-                discoveryClient.getInstances(statsServiceId);
+                discoveryClient.getInstances(
+                        statsServiceId
+                );
 
         if (instances == null || instances.isEmpty()) {
             throw new IllegalStateException(
-                    "В Eureka не найден сервис: " + statsServiceId
+                    "В Eureka не найден сервис: "
+                            + statsServiceId
             );
         }
 
-        int index = ThreadLocalRandom.current().nextInt(instances.size());
-        return instances.get(index);
+        return instances.getFirst();
     }
 
     private RetryTemplate createRetryTemplate() {
-        RetryTemplate template = new RetryTemplate();
+        RetryTemplate template =
+                new RetryTemplate();
 
-        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
-        backOffPolicy.setBackOffPeriod(1000L);
-        template.setBackOffPolicy(backOffPolicy);
+        FixedBackOffPolicy backOffPolicy =
+                new FixedBackOffPolicy();
 
-        MaxAttemptsRetryPolicy retryPolicy = new MaxAttemptsRetryPolicy();
+        backOffPolicy.setBackOffPeriod(3000L);
+
+        template.setBackOffPolicy(
+                backOffPolicy
+        );
+
+        MaxAttemptsRetryPolicy retryPolicy =
+                new MaxAttemptsRetryPolicy();
+
         retryPolicy.setMaxAttempts(3);
-        template.setRetryPolicy(retryPolicy);
+
+        template.setRetryPolicy(
+                retryPolicy
+        );
 
         return template;
     }

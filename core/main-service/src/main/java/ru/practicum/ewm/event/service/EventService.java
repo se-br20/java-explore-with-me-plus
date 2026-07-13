@@ -34,5 +34,4 @@ public interface EventService {
 
     List<EventShortDto> getShortDtosByIds(Collection<Long> eventIds);
 
-
 }

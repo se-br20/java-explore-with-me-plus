@@ -3,6 +3,7 @@ package ru.practicum.ewm.event.repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -37,7 +38,7 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
     ) {
         BooleanBuilder predicate = createPredicate(param);
 
-        var query = queryFactory
+        JPAQuery<EventShortDto> query = queryFactory
                 .select(
                         Projections.constructor(
                                 EventShortDto.class,
@@ -82,28 +83,12 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
                         event.initiator.id,
                         event.initiator.name,
                         event.paid,
+                        event.participantLimit,
                         event.publishedOn,
                         event.title
                 );
 
-        /*
-         * participantLimit = 0 означает, что лимита нет.
-         *
-         * В остальных случаях число подтверждённых заявок должно
-         * быть меньше установленного лимита.
-         */
-        if (param.isOnlyAvailable()) {
-            query.having(
-                    event.participantLimit.eq(0)
-                            .or(
-                                    request.count()
-                                            .lt(
-                                                    event.participantLimit
-                                                            .longValue()
-                                            )
-                            )
-            );
-        }
+        applyOnlyAvailableHaving(query, param);
 
         return query
                 .orderBy(event.eventDate.asc())
@@ -186,7 +171,7 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
     ) {
         BooleanBuilder predicate = createPredicate(param);
 
-        var query = queryFactory
+        JPAQuery<EventFullDto> query = queryFactory
                 .select(
                         Projections.constructor(
                                 EventFullDto.class,
@@ -248,18 +233,7 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
                         event.title
                 );
 
-        if (param.isOnlyAvailable()) {
-            query.having(
-                    event.participantLimit.eq(0)
-                            .or(
-                                    request.count()
-                                            .lt(
-                                                    event.participantLimit
-                                                            .longValue()
-                                            )
-                            )
-            );
-        }
+        applyOnlyAvailableHaving(query, param);
 
         return query
                 .orderBy(event.eventDate.asc())
@@ -268,19 +242,39 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
                 .fetch();
     }
 
+    private void applyOnlyAvailableHaving(
+            JPAQuery<?> query,
+            EventRepositoryParam param
+    ) {
+        if (!param.isOnlyAvailable()) {
+            return;
+        }
+
+        query.having(
+                event.participantLimit.eq(0)
+                        .or(
+                                request.count()
+                                        .lt(
+                                                event.participantLimit
+                                                        .longValue()
+                                        )
+                        )
+        );
+    }
+
     private BooleanBuilder createPredicate(
             EventRepositoryParam param
     ) {
         BooleanBuilder predicate = new BooleanBuilder();
 
-        /*
-         * Публичный GET /events должен возвращать только
-         * опубликованные события.
-         */
         if (param.isPublicRequest()) {
-            predicate.and(event.state.eq(EventState.PUBLISHED));
+            predicate.and(
+                    event.state.eq(EventState.PUBLISHED)
+            );
         } else if (param.hasStates()) {
-            predicate.and(event.state.in(param.getStates()));
+            predicate.and(
+                    event.state.in(param.getStates())
+            );
         }
 
         if (param.hasTextSearchRequest()) {
@@ -288,31 +282,40 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
                     event.annotation
                             .containsIgnoreCase(param.getText())
                             .or(
-                                    event.description.containsIgnoreCase(
-                                            param.getText()
-                                    )
+                                    event.description
+                                            .containsIgnoreCase(
+                                                    param.getText()
+                                            )
                             )
             );
         }
 
         if (param.hasCategories()) {
             predicate.and(
-                    event.category.id.in(param.getCategories())
+                    event.category.id.in(
+                            param.getCategories()
+                    )
             );
         }
 
         if (param.hasPaidParam()) {
-            predicate.and(event.paid.eq(param.getPaid()));
+            predicate.and(
+                    event.paid.eq(param.getPaid())
+            );
         }
 
         if (param.hasUsers()) {
             predicate.and(
-                    event.initiator.id.in(param.getUsers())
+                    event.initiator.id.in(
+                            param.getUsers()
+                    )
             );
         }
 
         if (param.hasIds()) {
-            predicate.and(event.id.in(param.getIds()));
+            predicate.and(
+                    event.id.in(param.getIds())
+            );
         }
 
         if (param.hasDateRange()) {
@@ -324,15 +327,21 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
             );
         } else if (param.hasRangeStart()) {
             predicate.and(
-                    event.eventDate.after(param.getRangeStart())
+                    event.eventDate.goe(
+                            param.getRangeStart()
+                    )
             );
         } else if (param.hasRangeEnd()) {
             predicate.and(
-                    event.eventDate.before(param.getRangeEnd())
+                    event.eventDate.loe(
+                            param.getRangeEnd()
+                    )
             );
         } else if (param.isPublicRequest()) {
             predicate.and(
-                    event.eventDate.after(LocalDateTime.now())
+                    event.eventDate.after(
+                            LocalDateTime.now()
+                    )
             );
         }
 

@@ -6,32 +6,13 @@ spring:
     name: stats-server
 
   config:
-    import: "${CONFIG_IMPORT:optional:configserver:http://localhost:8888}"
+    import: "optional:configserver:"
 
   cloud:
     config:
       discovery:
-        enabled: false
+        enabled: true
         service-id: config-server
-
-  datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/stats}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: true
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    properties:
-      hibernate:
-        format_sql: true
-
-  sql:
-    init:
-      mode: always
 
 eureka:
   client:
@@ -44,8 +25,3 @@ eureka:
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${random.value}
-
-logging:
-  level:
-    ru.practicum.stats: DEBUG
-    org.hibernate.SQL: DEBUG

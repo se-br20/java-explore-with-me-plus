@@ -33,9 +33,6 @@ public class GlobalExceptionHandler {
                     "yyyy-MM-dd HH:mm:ss"
             );
 
-    /*
-     * Ошибки @Valid у @RequestBody.
-     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleMethodArgumentNotValidException(
@@ -54,11 +51,6 @@ public class GlobalExceptionHandler {
                 message
         );
     }
-
-    /*
-     * Ошибки при проверке объекта параметров запроса,
-     * например PublicUserEventParam.
-     */
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleBindException(
@@ -77,10 +69,6 @@ public class GlobalExceptionHandler {
                 message
         );
     }
-
-    /*
-     * Собственная ручная валидация приложения.
-     */
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleValidationException(
@@ -101,11 +89,6 @@ public class GlobalExceptionHandler {
                 message
         );
     }
-
-    /*
-     * Нарушение UNIQUE, FOREIGN KEY и других
-     * ограничений базы данных.
-     */
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleDataIntegrityViolation(
@@ -123,11 +106,6 @@ public class GlobalExceptionHandler {
                 message
         );
     }
-
-    /*
-     * Ошибки @Min, @Positive и других проверок
-     * у @RequestParam и @PathVariable.
-     */
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleConstraintViolation(
@@ -156,14 +134,6 @@ public class GlobalExceptionHandler {
                 message
         );
     }
-
-    /*
-     * Например:
-     *
-     * /events/abc
-     *
-     * где вместо Long передана строка.
-     */
     @ExceptionHandler(
             MethodArgumentTypeMismatchException.class
     )
@@ -182,15 +152,6 @@ public class GlobalExceptionHandler {
                 exception.getMessage()
         );
     }
-
-    /*
-     * Ошибки чтения JSON:
-     *
-     * неправильная дата;
-     * неизвестное значение enum;
-     * повреждённый JSON;
-     * неправильный тип поля.
-     */
     @ExceptionHandler(
             HttpMessageNotReadableException.class
     )
@@ -210,9 +171,6 @@ public class GlobalExceptionHandler {
         );
     }
 
-    /*
-     * Не передан обязательный @RequestParam.
-     */
     @ExceptionHandler(
             MissingServletRequestParameterException.class
     )
@@ -232,9 +190,6 @@ public class GlobalExceptionHandler {
         );
     }
 
-    /*
-     * Сущность не найдена.
-     */
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleNotFoundException(
@@ -252,11 +207,6 @@ public class GlobalExceptionHandler {
         );
     }
 
-    /*
-     * Бизнес-условие не выполнено.
-     *
-     * HTTP-код и поле status теперь оба равны CONFLICT.
-     */
     @ExceptionHandler(ConditionsNotMetException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleConditionsNotMetException(
@@ -275,9 +225,6 @@ public class GlobalExceptionHandler {
         );
     }
 
-    /*
-     * Все остальные непредвиденные ошибки.
-     */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiError handleException(

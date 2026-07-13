@@ -12,3 +12,4 @@ eureka:
 
   server:
     response-cache-update-interval-ms: 1000
+    eviction-interval-timer-in-ms: 5000

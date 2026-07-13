@@ -6,18 +6,13 @@ spring:
     name: gateway-server
 
   config:
-    import: "${CONFIG_IMPORT:optional:configserver:http://localhost:8888}"
+    import: "optional:configserver:"
 
   cloud:
     config:
       discovery:
-        enabled: false
+        enabled: true
         service-id: config-server
-
-    gateway:
-      discovery:
-        locator:
-          enabled: false
 
 eureka:
   client:
@@ -30,7 +25,3 @@ eureka:
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${random.value}
-
-logging:
-  level:
-    org.springframework.cloud.gateway: DEBUG

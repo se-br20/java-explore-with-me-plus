@@ -2,31 +2,35 @@ server:
   port: 0
 
 spring:
-  application:
-    name: config-server
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/ewm}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
 
-  profiles:
-    active: native
+  jpa:
+    hibernate:
+      ddl-auto: none
 
-  cloud:
-    config:
-      server:
-        native:
-          search-locations:
-            - classpath:/config
+    show-sql: true
 
-eureka:
-  client:
-    service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-    register-with-eureka: true
-    fetch-registry: false
+    properties:
+      hibernate:
+        format_sql: true
 
-    initial-instance-info-replication-interval-seconds: 3
-    instance-info-replication-interval-seconds: 5
+  sql:
+    init:
+      mode: always
 
-  instance:
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${random.value}
-    lease-renewal-interval-in-seconds: 5
+app:
+  name: ewm-main-service
+
+stats-service:
+  id: stats-server
+
+logging:
+  level:
+    ru.practicum.ewm: DEBUG
+    org.hibernate.SQL: DEBUG
