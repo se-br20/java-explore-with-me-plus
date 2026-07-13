@@ -6,16 +6,16 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CompilationRepository {
+
     Compilation postCompilation(Compilation compilation);
 
-    void deleteCompilation(Long comId);
+    void deleteCompilation(Long compId);
 
-    Compilation patchCompilation(Long comId, Compilation compilation);
+    Compilation patchCompilation(Long compId, Compilation compilation, boolean replaceEvents);
 
     List<Compilation> getCompilations(Boolean pinned, int from, int size);
 
     Optional<Compilation> getCompilationById(Long compId);
 
     boolean existsById(Long compId);
-
 }
