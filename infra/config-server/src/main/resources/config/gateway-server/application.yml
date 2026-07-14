@@ -1,0 +1,31 @@
+server:
+  port: ${SERVER_PORT:8080}
+  address: 0.0.0.0
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: main-service-route
+          uri: lb://main-service
+          predicates:
+            - Path=/events/**,/categories/**,/compilations/**,/users/**,/admin/**,/comments/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+
+  instance:
+    instance-id: ${spring.application.name}:${server.port}
+    prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:false}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+  endpoint:
+    health:
+      show-details: always

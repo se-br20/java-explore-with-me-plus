@@ -53,16 +53,20 @@ public class GlobalExceptionHandler {
         return new ValidationErrorResponse("VALIDATION_FAILED", validationErrors);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ApiError handleException(final Exception ex, HttpStatus status) {
+    public ApiError handleException(Exception ex) {
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         ex.printStackTrace(pw);
         String stackTrace = sw.toString();
 
-        return new ApiError(status, ex.getMessage(), stackTrace);
+        return new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ex.getMessage(),
+                stackTrace
+        );
     }
 
 }

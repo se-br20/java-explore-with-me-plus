@@ -1,11 +1,12 @@
-package ru.practicum.stats.server;
+package ru.practicum.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class StatsServer {
+public class GatewayServer {
+
     public static void main(String[] args) {
-        SpringApplication.run(StatsServer.class, args);
+        SpringApplication.run(GatewayServer.class, args);
     }
 }

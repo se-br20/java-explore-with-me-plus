@@ -1,6 +1,6 @@
 spring:
   application:
-    name: stats-server
+    name: gateway-server
 
 eureka:
   client:

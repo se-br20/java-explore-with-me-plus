@@ -2,6 +2,8 @@ FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-COPY target/stats-server-*.jar app.jar
+COPY target/discovery-server-*.jar app.jar
+
+EXPOSE 8761
 
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

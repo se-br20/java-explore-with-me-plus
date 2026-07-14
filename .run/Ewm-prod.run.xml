@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Ewm-prod" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="ru.practicum.ewm.EwmService" />
+    <option name="MAIN_CLASS_NAME" value="ru.practicum.ewm.MainService" />
     <module name="main-service" />
     <extension name="coverage">
       <pattern>
