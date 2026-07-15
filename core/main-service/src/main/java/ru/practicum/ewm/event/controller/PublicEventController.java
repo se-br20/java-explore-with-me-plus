@@ -23,6 +23,7 @@ import java.util.List;
 @RequestMapping("/events")
 public class PublicEventController {
 
+    private static final String X_CLIENT_IP = "X-Client-IP";
     private static final String X_FORWARDED_FOR = "X-Forwarded-For";
     private static final String X_REAL_IP = "X-Real-IP";
 
@@ -70,18 +71,42 @@ public class PublicEventController {
     }
 
     private String extractClientIp(HttpServletRequest request) {
-        String forwardedFor = request.getHeader(X_FORWARDED_FOR);
+        String gatewayClientIp =
+                extractFirstAddress(request.getHeader(X_CLIENT_IP));
 
-        if (forwardedFor != null && !forwardedFor.isBlank()) {
-            return forwardedFor.split(",")[0].trim();
+        if (gatewayClientIp != null) {
+            return gatewayClientIp;
         }
 
-        String realIp = request.getHeader(X_REAL_IP);
+        String forwardedIp =
+                extractFirstAddress(request.getHeader(X_FORWARDED_FOR));
 
-        if (realIp != null && !realIp.isBlank()) {
-            return realIp.trim();
+        if (forwardedIp != null) {
+            return forwardedIp;
+        }
+
+        String realIp =
+                extractFirstAddress(request.getHeader(X_REAL_IP));
+
+        if (realIp != null) {
+            return realIp;
         }
 
         return request.getRemoteAddr();
+    }
+
+    private String extractFirstAddress(String headerValue) {
+        if (headerValue == null || headerValue.isBlank()) {
+            return null;
+        }
+
+        String firstAddress = headerValue.split(",")[0].trim();
+
+        if (firstAddress.isBlank()
+                || "unknown".equalsIgnoreCase(firstAddress)) {
+            return null;
+        }
+
+        return firstAddress;
     }
 }
