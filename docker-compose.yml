@@ -50,13 +50,15 @@ services:
       test:
         - CMD-SHELL
         - >
-          bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8888;
-          printf "GET /actuator/health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3;
-          grep -q "\"status\":\"UP\"" <&3'
+          bash -ec '
+          exec 3<>/dev/tcp/discovery-server/8761;
+          printf "GET /eureka/apps/CONFIG-SERVER HTTP/1.1\r\nHost: discovery-server\r\nAccept: application/json\r\nConnection: close\r\n\r\n" >&3;
+          grep -q "\"name\":\"CONFIG-SERVER\"" <&3
+          '
       interval: 3s
       timeout: 3s
       retries: 40
-      start_period: 15s
+      start_period: 10s
 
 
   stats-db:
@@ -109,6 +111,12 @@ services:
       EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
       EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS: "3"
       EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS: "10"
+
+      SPRING_CLOUD_CONFIG_FAIL_FAST: "true"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "30"
+      SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: "1000"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_INTERVAL: "3000"
+      SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER: "1.2"
 
       SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/stats
       SPRING_DATASOURCE_USERNAME: postgres
@@ -166,9 +174,6 @@ services:
       ewm-db:
         condition: service_healthy
 
-    expose:
-      - "8081"
-
     environment:
       SERVER_PORT: "8081"
       SERVER_ADDRESS: "0.0.0.0"
@@ -179,6 +184,12 @@ services:
       EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
       EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS: "3"
       EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS: "10"
+
+      SPRING_CLOUD_CONFIG_FAIL_FAST: "true"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "30"
+      SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: "1000"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_INTERVAL: "3000"
+      SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER: "1.2"
 
       SPRING_DATASOURCE_URL: jdbc:postgresql://ewm-db:5432/ewm
       SPRING_DATASOURCE_USERNAME: postgres
@@ -222,8 +233,12 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
-      EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS: "3"
-      EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS: "10"
+
+      SPRING_CLOUD_CONFIG_FAIL_FAST: "true"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "30"
+      SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: "1000"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_INTERVAL: "3000"
+      SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER: "1.2"
 
     healthcheck:
       test:
