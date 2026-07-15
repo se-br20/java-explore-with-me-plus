@@ -14,7 +14,6 @@ public class QueryDslConfig {
         this.entityManager = entityManager;
     }
 
-    // бин JPAQueryFactory, его мы используем в StatsRepositoryCustomImpl
     @Bean
     public JPAQueryFactory jpaQueryFactory() {
         return new JPAQueryFactory(entityManager);

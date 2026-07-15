@@ -1,55 +1,241 @@
 services:
 
+  discovery-server:
+    build:
+      context: ./infra/discovery-server
+    container_name: discovery-server
+    restart: on-failure
+
+    ports:
+      - "8761:8761"
+
+    environment:
+      SERVER_PORT: "8761"
+      SERVER_ADDRESS: "0.0.0.0"
+      SPRING_APPLICATION_NAME: discovery-server
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8761'
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
+
+
+  config-server:
+    build:
+      context: ./infra/config-server
+    container_name: config-server
+    restart: on-failure
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+
+    environment:
+      SERVER_PORT: "8888"
+      SERVER_ADDRESS: "0.0.0.0"
+      SPRING_APPLICATION_NAME: config-server
+      SPRING_PROFILES_ACTIVE: native
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8888'
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
+
+
   stats-db:
     image: postgres:16.1
     container_name: stats-db
+    restart: unless-stopped
+
     environment:
       POSTGRES_DB: stats
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+
+    volumes:
+      - stats-db-data:/var/lib/postgresql/data
+
     healthcheck:
-      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
-      timeout: 5s
+      test:
+        - CMD-SHELL
+        - pg_isready -q -d "$$POSTGRES_DB" -U "$$POSTGRES_USER"
       interval: 5s
-      retries: 10
+      timeout: 5s
+      retries: 20
+      start_period: 10s
 
 
   stats-server:
-    build: ./stats-service/stats-server
+    build:
+      context: ./stats-service/stats-server
     container_name: stats-server
+    restart: on-failure
+
     depends_on:
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
       stats-db:
         condition: service_healthy
+
     ports:
       - "9090:9090"
+
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stats
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
+      SERVER_PORT: "9090"
+      SERVER_ADDRESS: "0.0.0.0"
+      SPRING_APPLICATION_NAME: stats-server
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+
+      EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS: "10"
+
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+
+      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/stats
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          bash -ec 'exec 3<>/dev/tcp/127.0.0.1/9090;
+          printf "GET /actuator/health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3;
+          grep -q "\"status\":\"UP\"" <&3'
+      interval: 3s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+
 
   ewm-db:
     image: postgres:16.1
     container_name: ewm-db
+    restart: unless-stopped
+
     environment:
       POSTGRES_DB: ewm
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+
+    volumes:
+      - ewm-db-data:/var/lib/postgresql/data
+
     healthcheck:
-      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
-      timeout: 5s
+      test:
+        - CMD-SHELL
+        - pg_isready -q -d "$$POSTGRES_DB" -U "$$POSTGRES_USER"
       interval: 5s
-      retries: 10
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
 
   ewm-service:
-    build: ./ewm-service
-    container_name: ewm-service
+    build:
+      context: ./core/main-service
+    container_name: main-service
+    restart: on-failure
+
     depends_on:
-      - ewm-db
-      - stats-server
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      stats-server:
+        condition: service_healthy
+      ewm-db:
+        condition: service_healthy
+
+    expose:
+      - "8081"
+
+    environment:
+      SERVER_PORT: "8081"
+      SERVER_ADDRESS: "0.0.0.0"
+      SPRING_APPLICATION_NAME: main-service
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+
+      SPRING_DATASOURCE_URL: jdbc:postgresql://ewm-db:5432/ewm
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+      STATS_SERVER_URL: http://stats-server:9090
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8081;
+          printf "GET /actuator/health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3;
+          grep -q "\"status\":\"UP\"" <&3'
+      interval: 3s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+
+
+  gateway-server:
+    build:
+      context: ./infra/gateway-server
+    container_name: gateway-server
+    restart: on-failure
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      ewm-service:
+        condition: service_healthy
+
     ports:
       - "8080:8080"
+
     environment:
-      - STATS_SERVER_URL=http://stats-server:9090
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
+      SERVER_PORT: "8080"
+      SERVER_ADDRESS: "0.0.0.0"
+      SPRING_APPLICATION_NAME: gateway-server
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
+
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8080;
+          printf "GET /actuator/health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3;
+          grep -q "\"status\":\"UP\"" <&3'
+      interval: 3s
+      timeout: 3s
+      retries: 40
+      start_period: 15s
+
+
+volumes:
+  stats-db-data:
+  ewm-db-data:

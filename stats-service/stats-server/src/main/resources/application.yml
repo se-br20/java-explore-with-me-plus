@@ -1,27 +1,28 @@
-server:
-  port: 9090
-
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/stats
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: true
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    properties:
-      hibernate:
-        format_sql: true
+  application:
+    name: stats-server
 
   sql:
     init:
       mode: always
+      schema-locations: classpath:schema.sql
+      continue-on-error: false
 
-logging:
-  level:
-    ru.practicum.stats: DEBUG
-    org.hibernate.SQL: DEBUG
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "!test"
+
+    import: "optional:configserver:"
+
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: config-server
