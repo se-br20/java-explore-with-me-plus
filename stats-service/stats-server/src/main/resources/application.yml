@@ -2,6 +2,12 @@ spring:
   application:
     name: stats-server
 
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      continue-on-error: false
+
 eureka:
   client:
     service-url:
