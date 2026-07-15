@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Ewm-dev" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="ru.practicum.ewm.EwmService" />
+    <option name="MAIN_CLASS_NAME" value="ru.practicum.ewm.MainService" />
     <module name="main-service" />
     <option name="VM_PARAMETERS" value="-Dspring.profiles.active=dev" />
     <extension name="coverage">
