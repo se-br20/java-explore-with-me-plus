@@ -101,6 +101,10 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
 
+      EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS: "10"
+
       SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
 
       SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/stats
@@ -110,10 +114,13 @@ services:
     healthcheck:
       test:
         - CMD-SHELL
-        - bash -ec 'exec 3<>/dev/tcp/127.0.0.1/9090'
-      interval: 5s
-      timeout: 5s
-      retries: 30
+        - >
+          bash -ec 'exec 3<>/dev/tcp/127.0.0.1/9090;
+          printf "GET /actuator/health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3;
+          grep -q "\"status\":\"UP\"" <&3'
+      interval: 3s
+      timeout: 3s
+      retries: 40
       start_period: 20s
 
 
@@ -167,7 +174,10 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
 
-      # Не optional: внутри Docker Config Server обязателен.
+      EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS: "10"
+
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
 
       SPRING_DATASOURCE_URL: jdbc:postgresql://ewm-db:5432/ewm
@@ -179,10 +189,13 @@ services:
     healthcheck:
       test:
         - CMD-SHELL
-        - bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8081'
+        - >
+          bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8081;
+          printf "GET /actuator/health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3;
+          grep -q "\"status\":\"UP\"" <&3'
       interval: 3s
       timeout: 3s
-      retries: 30
+      retries: 40
       start_period: 20s
 
 
