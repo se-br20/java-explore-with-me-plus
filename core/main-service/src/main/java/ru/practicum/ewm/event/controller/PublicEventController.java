@@ -22,27 +22,65 @@ import java.util.List;
 @RestController
 @RequestMapping("/events")
 public class PublicEventController {
+
+    private static final String X_FORWARDED_FOR = "X-Forwarded-For";
+    private static final String X_REAL_IP = "X-Real-IP";
+
     private final EventService eventService;
 
     @GetMapping
-    public List<EventShortDto> getEvents(@Valid PublicUserEventParam param,
-                                         HttpServletRequest request) {
+    public List<EventShortDto> getEvents(
+            @Valid PublicUserEventParam param,
+            HttpServletRequest request
+    ) {
+        String clientIp = extractClientIp(request);
 
         param.setUri(request.getRequestURI());
-        param.setIp(request.getRemoteAddr());
+        param.setIp(clientIp);
 
-        log.debug("Public request to get events: {}", param);
+        log.debug(
+                "Public request to get events: uri={}, clientIp={}, params={}",
+                request.getRequestURI(),
+                clientIp,
+                param
+        );
 
         return eventService.getEventsForPublicRequests(param);
     }
 
     @GetMapping("/{id}")
-    public EventFullDto getEvent(@PathVariable long id, HttpServletRequest request) {
+    public EventFullDto getEvent(
+            @PathVariable long id,
+            HttpServletRequest request
+    ) {
+        String clientIp = extractClientIp(request);
 
-        log.debug("Request to get event: uri={}, ip={}, id={}", request.getRequestURI(), request.getRemoteAddr(), id);
+        log.debug(
+                "Public request to get event: uri={}, clientIp={}, eventId={}",
+                request.getRequestURI(),
+                clientIp,
+                id
+        );
 
-        return eventService.findEventById(request.getRequestURI(), request.getRemoteAddr(), id);
+        return eventService.findEventById(
+                request.getRequestURI(),
+                clientIp,
+                id
+        );
     }
+    private String extractClientIp(HttpServletRequest request) {
+        String forwardedFor = request.getHeader(X_FORWARDED_FOR);
 
+        if (forwardedFor != null && !forwardedFor.isBlank()) {
+            return forwardedFor.split(",")[0].trim();
+        }
 
+        String realIp = request.getHeader(X_REAL_IP);
+
+        if (realIp != null && !realIp.isBlank()) {
+            return realIp.trim();
+        }
+
+        return request.getRemoteAddr();
+    }
 }

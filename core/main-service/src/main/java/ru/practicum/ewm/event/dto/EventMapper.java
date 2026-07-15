@@ -112,7 +112,11 @@ public class EventMapper {
                 .build();
     }
 
-    public static EventShortDto toEventShortDto(Event event, Long confirmedRequests, Long views) {
+    public static EventShortDto toEventShortDto(
+            Event event,
+            Long confirmedRequests,
+            Long views
+    ) {
         return EventShortDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
@@ -121,6 +125,7 @@ public class EventMapper {
                 .eventDate(event.getEventDate())
                 .initiator(UserMapper.toUserShortDto(event.getInitiator()))
                 .paid(event.getPaid())
+                .publishedOn(event.getPublishedOn())
                 .title(event.getTitle())
                 .views(views)
                 .commentsCount(0L)

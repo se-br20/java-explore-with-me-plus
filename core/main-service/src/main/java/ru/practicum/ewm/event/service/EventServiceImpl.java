@@ -375,21 +375,39 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> getShortDtosByIds(Collection<Long> eventId) {
-        if (eventId == null || eventId.isEmpty()) {
+    @Transactional(readOnly = true)
+    public List<EventShortDto> getShortDtosByIds(Collection<Long> eventIds) {
+        if (eventIds == null || eventIds.isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<Event> events = eventRepository.findAllByIdIn(eventId);
+        List<Event> events = eventRepository.findAllByIdIn(eventIds);
 
-        List<EventShortDto> dtos = events.stream()
-                .map(event -> EventMapper.toEventShortDto(event, 0L, 0L))
+        if (events.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Map<Long, Event> eventsById = events.stream()
+                .collect(Collectors.toMap(
+                        Event::getId,
+                        event -> event
+                ));
+
+        List<EventShortDto> eventDtos = eventIds.stream()
+                .distinct()
+                .map(eventsById::get)
+                .filter(Objects::nonNull)
+                .map(event -> EventMapper.toEventShortDto(
+                        event,
+                        0L,
+                        0L
+                ))
                 .collect(Collectors.toList());
 
-        enrichEventsWithViews(dtos);
-        enrichEventsListWithCommentsCount(dtos);
+        enrichEventsWithViews(eventDtos);
+        enrichEventsListWithCommentsCount(eventDtos);
 
-        return dtos;
+        return eventDtos;
     }
 
     private void updateStatuses(List<ParticipationRequest> requests, RequestStatus status) {
