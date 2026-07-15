@@ -16,7 +16,6 @@ import ru.practicum.stat.dto.ViewStatsDto;
 import java.net.URI;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -27,9 +26,6 @@ public class StatsClient {
 
     private static final DateTimeFormatter FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-    private static final int MAX_ATTEMPTS = 6;
-    private static final long RETRY_DELAY_MILLIS = 1000L;
 
     private final RestTemplate template;
     private final String statsUrl;
@@ -46,7 +42,6 @@ public class StatsClient {
     }
 
     public void hit(EndpointHitDto endpointHit) {
-
         EndpointHitDto requestBody = EndpointHitDto.builder()
                 .app(appName)
                 .uri(endpointHit.getUri())
@@ -54,30 +49,32 @@ public class StatsClient {
                 .timestamp(endpointHit.getTimestamp())
                 .build();
 
-        executeWithRetry(
-                () -> {
-                    HttpEntity<EndpointHitDto> requestEntity =
-                            new HttpEntity<>(requestBody);
+        try {
+            HttpEntity<EndpointHitDto> requestEntity =
+                    new HttpEntity<>(requestBody);
 
-                    template.exchange(
-                            statsUrl + "/hit",
-                            POST,
-                            requestEntity,
-                            Void.class
-                    );
+            template.exchange(
+                    statsUrl + "/hit",
+                    POST,
+                    requestEntity,
+                    Void.class
+            );
 
-                    log.debug(
-                            "Hit successfully sent: app={}, uri={}, ip={}",
-                            requestBody.getApp(),
-                            requestBody.getUri(),
-                            requestBody.getIp()
-                    );
-
-                    return null;
-                },
-                "sending hit to stats-server",
-                null
-        );
+            log.debug(
+                    "Hit saved: app={}, uri={}, ip={}, timestamp={}",
+                    requestBody.getApp(),
+                    requestBody.getUri(),
+                    requestBody.getIp(),
+                    requestBody.getTimestamp()
+            );
+        } catch (RestClientException exception) {
+            log.error(
+                    "Failed to save hit to {}: {}",
+                    statsUrl,
+                    exception.getMessage(),
+                    exception
+            );
+        }
     }
 
     public List<ViewStatsDto> get(ParamDto paramDto) {
@@ -108,80 +105,35 @@ public class StatsClient {
                 .encode()
                 .toUri();
 
-        return executeWithRetry(
-                () -> {
-                    ResponseEntity<List<ViewStatsDto>> response =
-                            template.exchange(
-                                    uri,
-                                    GET,
-                                    null,
-                                    new ParameterizedTypeReference<>() {
-                                    }
-                            );
-
-                    List<ViewStatsDto> body = response.getBody();
-
-                    log.debug(
-                            "Stats successfully received: uri={}, status={}, body={}",
+        try {
+            ResponseEntity<List<ViewStatsDto>> response =
+                    template.exchange(
                             uri,
-                            response.getStatusCode(),
-                            body
+                            GET,
+                            null,
+                            new ParameterizedTypeReference<>() {
+                            }
                     );
 
-                    return body != null ? body : List.of();
-                },
-                "receiving statistics from stats-server",
-                List.of()
-        );
-    }
+            List<ViewStatsDto> body = response.getBody();
 
-    private <T> T executeWithRetry(
-            Supplier<T> action,
-            String operation,
-            T fallbackValue
-    ) {
-        RestClientException lastException = null;
+            log.debug(
+                    "Stats received: request={}, status={}, body={}",
+                    uri,
+                    response.getStatusCode(),
+                    body
+            );
 
-        for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-            try {
-                return action.get();
-            } catch (RestClientException exception) {
-                lastException = exception;
-
-                log.warn(
-                        "Error while {}. Attempt {}/{}. Reason: {}",
-                        operation,
-                        attempt,
-                        MAX_ATTEMPTS,
-                        exception.getMessage()
-                );
-
-                if (attempt < MAX_ATTEMPTS) {
-                    pauseBeforeRetry();
-                }
-            }
-        }
-
-        log.error(
-                "Unable to complete {} after {} attempts",
-                operation,
-                MAX_ATTEMPTS,
-                lastException
-        );
-
-        return fallbackValue;
-    }
-
-    private void pauseBeforeRetry() {
-        try {
-            Thread.sleep(RETRY_DELAY_MILLIS);
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt();
-
-            throw new IllegalStateException(
-                    "Stats-server request retry was interrupted",
+            return body != null ? body : List.of();
+        } catch (RestClientException exception) {
+            log.error(
+                    "Failed to receive stats from {}: {}",
+                    uri,
+                    exception.getMessage(),
                     exception
             );
+
+            return List.of();
         }
     }
 }

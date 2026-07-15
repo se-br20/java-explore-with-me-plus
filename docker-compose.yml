@@ -174,17 +174,13 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
 
-      EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
-      EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS: "3"
-      EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS: "10"
-
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
 
       SPRING_DATASOURCE_URL: jdbc:postgresql://ewm-db:5432/ewm
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
 
-      STATS_SERVER_URL: http://stats-server
+      STATS_SERVER_URL: http://stats-server:9090
 
     healthcheck:
       test:

@@ -33,6 +33,7 @@ import ru.practicum.stat.dto.ParamDto;
 import ru.practicum.stat.dto.ViewStatsDto;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -445,38 +446,53 @@ public class EventServiceImpl implements EventService {
         );
     }
 
-    private Map<Long, Long> fetchViews(String[] uris, LocalDateTime date) {
+    private Map<Long, Long> fetchViews(
+            String[] uris,
+            LocalDateTime date
+    ) {
         LocalDateTime start = date != null
-                ? date
+                ? date.truncatedTo(ChronoUnit.SECONDS)
                 : LocalDateTime.of(1970, 1, 1, 0, 0);
+
+        LocalDateTime end = LocalDateTime.now()
+                .plusSeconds(1)
+                .truncatedTo(ChronoUnit.SECONDS);
 
         ParamDto statRequestParam = ParamDto.builder()
                 .start(start)
-                .end(LocalDateTime.now().plusSeconds(1))
+                .end(end)
                 .uris(uris)
                 .unique(true)
                 .build();
 
-        log.debug("Fetching views for uris: {}, params: {}", Arrays.toString(uris), statRequestParam);
+        log.debug(
+                "Fetching views: uris={}, start={}, end={}",
+                Arrays.toString(uris),
+                start,
+                end
+        );
 
         try {
-            List<ViewStatsDto> stats = statsClient.get(statRequestParam);
+            List<ViewStatsDto> stats =
+                    statsClient.get(statRequestParam);
 
             log.debug("Stats received from client: {}", stats);
 
-            if (stats.size() == 1 && stats.getFirst().getHits() == -1) {
-                log.error("Failed to fetch views from stats-service, returned hits = -1 (Fail marker)");
-                return Collections.emptyMap();
-            }
-
             return stats.stream()
-                    .filter(stat -> stat.getUri() != null && stat.getHits() != -1)
+                    .filter(stat -> stat.getUri() != null)
+                    .filter(stat -> stat.getHits() != null)
+                    .filter(stat -> stat.getHits() >= 0)
                     .collect(Collectors.toMap(
                             this::extractEventIdFromUri,
-                            ViewStatsDto::getHits
+                            ViewStatsDto::getHits,
+                            Long::sum
                     ));
-        } catch (Exception e) {
-            log.error("Failed to fetch views from stats-service", e);
+        } catch (Exception exception) {
+            log.error(
+                    "Failed to fetch views from stats-server",
+                    exception
+            );
+
             return Collections.emptyMap();
         }
     }
