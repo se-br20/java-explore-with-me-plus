@@ -27,8 +27,6 @@ public class AdminEventController {
         return eventService.getEventsForAdminRequests(param);
     }
 
-
-    // Валидация данных не требуется, по спецификации
     @PatchMapping("/{eventId}")
     public EventFullDto updateEvent(
             @PathVariable long eventId,

@@ -68,6 +68,7 @@ public class PublicEventController {
                 id
         );
     }
+
     private String extractClientIp(HttpServletRequest request) {
         String forwardedFor = request.getHeader(X_FORWARDED_FOR);
 
