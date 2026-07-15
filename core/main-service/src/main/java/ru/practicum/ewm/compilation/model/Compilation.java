@@ -1,7 +1,21 @@
 package ru.practicum.ewm.compilation.model;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import ru.practicum.ewm.event.model.Event;
 
 import java.util.ArrayList;
@@ -12,10 +26,11 @@ import java.util.List;
 @Builder
 @Getter
 @Setter
-@ToString(onlyExplicitlyIncluded = true)  //  безопасно для @OneToMany и lazy-загрузок
-@NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA обязан иметь конструктор без аргументов
-@AllArgsConstructor  // для Builder
+@ToString(onlyExplicitlyIncluded = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Compilation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,6 +41,7 @@ public class Compilation {
     @Column(nullable = false)
     private Boolean pinned;
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "compilation_events",
@@ -33,5 +49,4 @@ public class Compilation {
             inverseJoinColumns = @JoinColumn(name = "event_id")
     )
     private List<Event> events = new ArrayList<>();
-
 }

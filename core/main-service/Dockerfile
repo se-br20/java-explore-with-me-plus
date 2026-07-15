@@ -4,4 +4,6 @@ WORKDIR /app
 
 COPY target/ewm-service-*.jar app.jar
 
+EXPOSE 8081
+
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

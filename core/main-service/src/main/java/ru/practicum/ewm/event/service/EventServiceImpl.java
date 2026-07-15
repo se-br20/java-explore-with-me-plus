@@ -95,10 +95,21 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> getEventsForPublicRequests(PublicUserEventParam userEventParam) {
-        EventRepositoryParam param = EventRepositoryParam.fromUserEventParam(userEventParam);
+    public List<EventShortDto> getEventsForPublicRequests(
+            PublicUserEventParam userEventParam
+    ) {
+        EventRepositoryParam param =
+                EventRepositoryParam.fromUserEventParam(userEventParam);
 
-        List<EventShortDto> events = eventRepository.findEventsShortDto(param);
+        List<EventShortDto> events =
+                eventRepository.findEventsShortDto(param);
+
+        sendHit(
+                userEventParam.getUri(),
+                userEventParam.getIp(),
+                LocalDateTime.now()
+        );
+
         if (events.isEmpty()) {
             return events;
         }
@@ -106,11 +117,12 @@ public class EventServiceImpl implements EventService {
         enrichEventsWithViews(events);
         enrichEventsListWithCommentsCount(events);
 
-        if (param.getSortOrDefault() == EventSort.VIEWS) {  // из репозитория приходят уже отсортированными по дате
-            events.sort(Comparator.comparing(EventShortDto::getViews).reversed());
+        if (param.getSortOrDefault() == EventSort.VIEWS) {
+            events.sort(
+                    Comparator.comparing(EventShortDto::getViews)
+                            .reversed()
+            );
         }
-
-        sendHit(userEventParam.getUri(), userEventParam.getIp(), LocalDateTime.now());
 
         return events;
     }

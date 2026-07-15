@@ -68,13 +68,16 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     @Override
     public List<ParticipationRequestDto> getUserParticipationRequests(Long userId) {
-        List<ParticipationRequest> requests = requestRepository.findByRequesterId(userId);
-
-        if (requests.isEmpty()) {
-            return List.of();
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException(
+                    "User with id=" + userId + " was not found"
+            );
         }
 
-        return requestMapper.toParticipationRequestDto(requests);
+        List<ParticipationRequest> requests =
+                requestRepository.findByRequesterId(userId);
+
+        return ParticipationRequestMapper.toParticipationRequestDto(requests);
     }
 
     @Override
