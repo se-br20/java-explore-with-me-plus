@@ -1,0 +1,41 @@
+server:
+  port: ${SERVER_PORT:0}
+  address: 0.0.0.0
+
+spring:
+  application:
+    name: config-server
+
+  profiles:
+    active: native
+
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/config/{application}
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: ${EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS:3}
+
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+    prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:false}
+    lease-renewal-interval-in-seconds: ${EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS:3}
+    lease-expiration-duration-in-seconds: ${EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS:10}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+  endpoint:
+    health:
+      show-details: always
