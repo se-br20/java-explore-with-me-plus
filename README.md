@@ -61,6 +61,7 @@ flowchart LR
     Config --> Comment
 ```
 
+
 ## Структура Maven-проекта
 
 ```text
