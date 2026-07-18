@@ -434,28 +434,56 @@ services:
       start_period: 20s
 
   gateway-server:
-    container_name: gateway-server
-
     build:
       context: ./infra/gateway-server
-      dockerfile: Dockerfile
+
+    container_name: gateway-server
+    restart: on-failure
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+
+      config-server:
+        condition: service_healthy
+
+      stats-server:
+        condition: service_healthy
+
+      request-service:
+        condition: service_healthy
+
+      comment-service:
+        condition: service_healthy
+
+      event-service:
+        condition: service_healthy
+
+      user-service:
+        condition: service_healthy
+
+    ports:
+      - "8080:8080"
 
     environment:
       SPRING_APPLICATION_NAME: gateway-server
-      SERVER_PORT: 8080
-      SERVER_ADDRESS: 0.0.0.0
+      SERVER_PORT: "8080"
+      SERVER_ADDRESS: "0.0.0.0"
 
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: >
-        http://discovery-server:8761/eureka/
-
-      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
-      EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
+      SPRING_CONFIG_IMPORT: "configserver:http://config-server:8888"
+      SPRING_CLOUD_CONFIG_DISCOVERY_ENABLED: "false"
 
       SPRING_CLOUD_CONFIG_FAIL_FAST: "true"
-      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "30"
       SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: "1000"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "30"
       SPRING_CLOUD_CONFIG_RETRY_MAX_INTERVAL: "3000"
       SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER: "1.2"
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discovery-server:8761/eureka/"
+      EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS: "10"
 
       GATEWAY_WAIT_FOR_REQUIRED_SERVICES: "true"
       GATEWAY_REQUIRED_SERVICES_TIMEOUT_SECONDS: "90"
@@ -464,10 +492,9 @@ services:
       test:
         - CMD-SHELL
         - >
-          bash -ec
-          'exec 3<>/dev/tcp/127.0.0.1/8080;
+          bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8080;
           printf "GET /actuator/health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3;
-          grep -q "^{\"status\":\"UP\"" <&3'
+          grep -q "\"status\":\"UP\"" <&3'
       interval: 3s
       timeout: 3s
       retries: 40
