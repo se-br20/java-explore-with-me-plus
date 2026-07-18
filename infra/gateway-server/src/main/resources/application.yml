@@ -3,13 +3,7 @@ spring:
     name: gateway-server
 
   config:
-    import: "configserver:"
-
-  cloud:
-    config:
-      discovery:
-        enabled: true
-        service-id: config-server
+    import: "configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
 
 eureka:
   client:
