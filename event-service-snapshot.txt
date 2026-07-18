@@ -1,0 +1,4182 @@
+﻿
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\pom.xml
+==================================================
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ru.practicum</groupId>
+        <artifactId>core</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>main-service</artifactId>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <querydsl.version>5.1.0</querydsl.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>ru.practicum</groupId>
+            <artifactId>stats-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.practicum</groupId>
+            <artifactId>interaction-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+        </dependency>
+
+        <!-- JPA annotations -->
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+        </dependency>
+
+        <!-- QueryDSL JPA -->
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-jpa</artifactId>
+            <version>${querydsl.version}</version>
+            <classifier>jakarta</classifier>
+        </dependency>
+
+        <!-- annotation processor -->
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-apt</artifactId>
+            <version>${querydsl.version}</version>
+            <classifier>jakarta</classifier>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-openfeign-core</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <annotationProcessorPaths>
+
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.32</version>
+                        </path>
+
+                        <path>
+                            <groupId>com.querydsl</groupId>
+                            <artifactId>querydsl-apt</artifactId>
+                            <version>5.1.0</version>
+                            <classifier>jakarta</classifier>
+                        </path>
+
+                        <path>
+                            <groupId>jakarta.persistence</groupId>
+                            <artifactId>jakarta.persistence-api</artifactId>
+                            <version>3.1.0</version>
+                        </path>
+
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\controller\AdminEventController.java
+==================================================
+package ru.practicum.ewm.event.controller;
+
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.dto.UpdateEventAdminRequest;
+import ru.practicum.ewm.event.dto.paramDto.AdminUserEventParam;
+import ru.practicum.ewm.event.service.EventService;
+
+import java.util.List;
+
+@Slf4j
+@Validated
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/admin/events")
+public class AdminEventController {
+    private final EventService eventService;
+
+    @GetMapping
+    public List<EventFullDto> getEvents(@Valid AdminUserEventParam param) {
+        log.debug("Admin request to get events: {}", param);
+        return eventService.getEventsForAdminRequests(param);
+    }
+
+    @PatchMapping("/{eventId}")
+    public EventFullDto updateEvent(
+            @PathVariable long eventId,
+            @RequestBody @Valid UpdateEventAdminRequest body) {
+        log.debug("Admin request to update event:  eventId={}", eventId);
+
+        return eventService.updateEvent(eventId, body);
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\controller\PrivateEventController.java
+==================================================
+package ru.practicum.ewm.event.controller;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.dto.EventShortDto;
+import ru.practicum.ewm.event.dto.NewEventDto;
+import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
+import ru.practicum.ewm.event.service.EventService;
+
+import java.util.List;
+
+@Slf4j
+@RestController
+@RequestMapping("/users/{userId}/events")
+@Validated
+@RequiredArgsConstructor
+public class PrivateEventController {
+
+    private final EventService eventService;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public EventFullDto addEvent(
+            @PathVariable long userId,
+            @RequestBody @Valid NewEventDto newEventDto
+    ) {
+        log.debug(
+                "Request to add new event: userId={}",
+                userId
+        );
+
+        return eventService.createEvent(userId, newEventDto);
+    }
+
+    @GetMapping
+    public List<EventShortDto> getUserEvents(
+            @PathVariable long userId,
+            @RequestParam(defaultValue = "0")
+            @Min(0) int from,
+            @RequestParam(defaultValue = "10")
+            @Positive int size
+    ) {
+        log.debug(
+                "Request to get user events: userId={}",
+                userId
+        );
+
+        return eventService.getUserEvents(userId, from, size);
+    }
+
+    @GetMapping("/{eventId}")
+    public EventFullDto getUserEvent(
+            @PathVariable long userId,
+            @PathVariable long eventId
+    ) {
+        log.debug(
+                "Request to get user event: userId={}, eventId={}",
+                userId,
+                eventId
+        );
+
+        return eventService.findUserEventByEventId(
+                userId,
+                eventId
+        );
+    }
+
+    @PatchMapping("/{eventId}")
+    public EventFullDto updateUserEvent(
+            @PathVariable long userId,
+            @PathVariable long eventId,
+            @RequestBody @Valid UpdateEventUserRequest body
+    ) {
+        log.debug(
+                "Request to update user event: userId={}, eventId={}",
+                userId,
+                eventId
+        );
+
+        return eventService.updateUserEvent(
+                userId,
+                eventId,
+                body
+        );
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\controller\PublicEventController.java
+==================================================
+package ru.practicum.ewm.event.controller;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.dto.EventShortDto;
+import ru.practicum.ewm.event.dto.paramDto.PublicUserEventParam;
+import ru.practicum.ewm.event.service.EventService;
+
+import java.util.List;
+
+@Slf4j
+@Validated
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/events")
+public class PublicEventController {
+
+    private static final String X_FORWARDED_FOR = "X-Forwarded-For";
+    private static final String X_REAL_IP = "X-Real-IP";
+
+    private final EventService eventService;
+
+    @GetMapping
+    public List<EventShortDto> getEvents(
+            @Valid PublicUserEventParam param,
+            HttpServletRequest request
+    ) {
+        String clientIp = extractClientIp(request);
+
+        param.setUri(request.getRequestURI());
+        param.setIp(clientIp);
+
+        log.debug(
+                "Public request to get events: uri={}, clientIp={}, params={}",
+                request.getRequestURI(),
+                clientIp,
+                param
+        );
+
+        return eventService.getEventsForPublicRequests(param);
+    }
+
+    @GetMapping("/{id}")
+    public EventFullDto getEvent(
+            @PathVariable long id,
+            HttpServletRequest request
+    ) {
+        String clientIp = extractClientIp(request);
+
+        log.debug(
+                "Public request to get event: uri={}, clientIp={}, eventId={}",
+                request.getRequestURI(),
+                clientIp,
+                id
+        );
+
+        return eventService.findEventById(
+                request.getRequestURI(),
+                clientIp,
+                id
+        );
+    }
+
+    private String extractClientIp(HttpServletRequest request) {
+        String forwardedFor = request.getHeader(X_FORWARDED_FOR);
+
+        if (forwardedFor != null && !forwardedFor.isBlank()) {
+            return forwardedFor.split(",")[0].trim();
+        }
+
+        String realIp = request.getHeader(X_REAL_IP);
+
+        if (realIp != null && !realIp.isBlank()) {
+            return realIp.trim();
+        }
+
+        return request.getRemoteAddr();
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\dto\Commentable.java
+==================================================
+package ru.practicum.ewm.event.dto;
+
+public interface Commentable {
+    Long getId();
+
+    void setCommentsCount(Long count);
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\dto\EventCountsAware.java
+==================================================
+package ru.practicum.ewm.event.dto;
+
+public interface EventCountsAware extends Commentable, Viewable {
+
+    Long getConfirmedRequests();
+
+    void setConfirmedRequests(Long confirmedRequests);
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\dto\EventFullDto.java
+==================================================
+package ru.practicum.ewm.event.dto;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.practicum.ewm.categories.dto.CategoryDto;
+import ru.practicum.ewm.event.model.EventState;
+import ru.practicum.ewm.event.model.Location;
+import ru.practicum.ewm.user.dto.UserShortDto;
+
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class EventFullDto implements EventCountsAware {
+    private Long id;
+
+    @NotBlank
+    @Size(min = 20, max = 2000)
+    private String annotation;
+
+    private CategoryDto category;
+
+    private Long confirmedRequests;  // РёР· С‚Р°Р±Р»РёС†С‹ Р·Р°РїСЂРѕСЃРѕРІ РЅР° СѓС‡Р°СЃС‚РёРµ
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdOn;
+
+    @NotBlank
+    @Size(min = 20, max = 7000)
+    private String description;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime eventDate;
+
+    private UserShortDto initiator;
+
+    private Location location;
+
+    private Boolean paid;
+
+    private Integer participantLimit;  // РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 0
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime publishedOn;
+
+    private Boolean requestModeration;  // РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ true
+
+    private EventState state;
+
+    @NotBlank
+    @Size(min = 3, max = 120)
+    private String title;
+
+    private Long views;  // РёР· СЃРµСЂРІРёСЃР° СЃС‚Р°С‚РёСЃС‚РёРєРё
+
+    private Long commentsCount;
+
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\dto\EventMapper.java
+==================================================
+package ru.practicum.ewm.event.dto;
+
+import lombok.RequiredArgsConstructor;
+import ru.practicum.ewm.categories.dto.CategoryMapper;
+import ru.practicum.ewm.categories.model.Category;
+import ru.practicum.ewm.event.model.Event;
+import ru.practicum.ewm.event.model.EventState;
+import ru.practicum.ewm.user.dto.UserMapper;
+import ru.practicum.ewm.user.model.User;
+
+import java.time.LocalDateTime;
+
+@RequiredArgsConstructor
+public class EventMapper {
+
+    public static Event toEvent(NewEventDto newEventDto, Category category, User initiator) {
+        return Event.builder()
+                .annotation(newEventDto.getAnnotation())
+                .category(category)
+                .description(newEventDto.getDescription())
+                .eventDate(newEventDto.getEventDate())
+                .location(newEventDto.getLocation())
+                .paid(newEventDto.getPaid() != null ? newEventDto.getPaid() : false)
+                .participantLimit(newEventDto.getParticipantLimit() != null ? newEventDto.getParticipantLimit() : 0)
+                .requestModeration(newEventDto.getRequestModeration() != null ? newEventDto.getRequestModeration() : true)
+                .title(newEventDto.getTitle())
+                .initiator(initiator)
+                .state(EventState.PENDING)
+                .createdOn(LocalDateTime.now())
+                .build();
+    }
+
+    public static void updateEventFromAdminRequest(UpdateEventAdminRequest request, Event event, Category category) {
+        if (request.getAnnotation() != null) {
+            event.setAnnotation(request.getAnnotation());
+        }
+        if (category != null) {
+            event.setCategory(category);
+        }
+        if (request.getDescription() != null) {
+            event.setDescription(request.getDescription());
+        }
+        if (request.getEventDate() != null) {
+            event.setEventDate(request.getEventDate());
+        }
+        if (request.getLocation() != null) {
+            event.setLocation(request.getLocation());
+        }
+        if (request.getPaid() != null) {
+            event.setPaid(request.getPaid());
+        }
+        if (request.getParticipantLimit() != null) {
+            event.setParticipantLimit(request.getParticipantLimit());
+        }
+        if (request.getRequestModeration() != null) {
+            event.setRequestModeration(request.getRequestModeration());
+        }
+        if (request.getTitle() != null) {
+            event.setTitle(request.getTitle());
+        }
+    }
+
+    public static void updateEventFromUserRequest(UpdateEventUserRequest request, Event event, Category category) {
+        if (request.getAnnotation() != null) {
+            event.setAnnotation(request.getAnnotation());
+        }
+        if (category != null) {
+            event.setCategory(category);
+        }
+        if (request.getDescription() != null) {
+            event.setDescription(request.getDescription());
+        }
+        if (request.getEventDate() != null) {
+            event.setEventDate(request.getEventDate());
+        }
+        if (request.getLocation() != null) {
+            event.setLocation(request.getLocation());
+        }
+        if (request.getPaid() != null) {
+            event.setPaid(request.getPaid());
+        }
+        if (request.getParticipantLimit() != null) {
+            event.setParticipantLimit(request.getParticipantLimit());
+        }
+        if (request.getRequestModeration() != null) {
+            event.setRequestModeration(request.getRequestModeration());
+        }
+        if (request.getTitle() != null) {
+            event.setTitle(request.getTitle());
+        }
+    }
+
+    public static EventFullDto toEventFullDto(Event event, Long confirmedRequests, Long views) {
+        return EventFullDto.builder()
+                .id(event.getId())
+                .annotation(event.getAnnotation())
+                .category(CategoryMapper.toCategoryDto(event.getCategory()))
+                .confirmedRequests(confirmedRequests)
+                .createdOn(event.getCreatedOn())
+                .description(event.getDescription())
+                .eventDate(event.getEventDate())
+                .initiator(UserMapper.toUserShortDto(event.getInitiator()))
+                .location(event.getLocation())
+                .paid(event.getPaid())
+                .participantLimit(event.getParticipantLimit())
+                .publishedOn(event.getPublishedOn())
+                .requestModeration(event.getRequestModeration())
+                .state(event.getState())
+                .title(event.getTitle())
+                .views(views)
+                .commentsCount(0L)
+                .build();
+    }
+
+    public static EventShortDto toEventShortDto(
+            Event event,
+            Long confirmedRequests,
+            Long views
+    ) {
+        return EventShortDto.builder()
+                .id(event.getId())
+                .annotation(event.getAnnotation())
+                .category(CategoryMapper.toCategoryDto(event.getCategory()))
+                .confirmedRequests(confirmedRequests)
+                .eventDate(event.getEventDate())
+                .initiator(UserMapper.toUserShortDto(event.getInitiator()))
+                .paid(event.getPaid())
+                .publishedOn(event.getPublishedOn())
+                .title(event.getTitle())
+                .views(views)
+                .commentsCount(0L)
+                .build();
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\dto\EventShortDto.java
+==================================================
+package ru.practicum.ewm.event.dto;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.practicum.ewm.categories.dto.CategoryDto;
+import ru.practicum.ewm.user.dto.UserShortDto;
+
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class EventShortDto implements EventCountsAware {
+    private Long id;
+
+    private String annotation;
+
+    private CategoryDto category;
+
+    private Long confirmedRequests;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime eventDate;
+
+    private UserShortDto initiator;
+
+    private Boolean paid;
+
+    @JsonIgnore
+
+    private LocalDateTime publishedOn;
+
+    private String title;
+
+    private Long views;
+
+    private Long commentsCount;
+
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\dto\NewEventDto.java
+==================================================
+package ru.practicum.ewm.event.dto;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.practicum.ewm.event.model.Location;
+
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class NewEventDto {
+
+    @NotBlank
+    @Size(min = 20, max = 2000)
+    private String annotation;
+
+    @NotNull
+    private Long category;
+
+    @NotBlank
+    @Size(min = 20, max = 7000)
+    private String description;
+
+    @NotNull
+    @Future
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime eventDate;
+
+    @NotNull
+    private Location location;
+
+    private Boolean paid;
+
+    @Min(0)
+    private Integer participantLimit;
+
+    private Boolean requestModeration;
+
+    @NotBlank
+    @Size(min = 3, max = 120)
+    private String title;
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\dto\UpdateEventAdminRequest.java
+==================================================
+package ru.practicum.ewm.event.dto;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.practicum.ewm.event.model.AdminStateAction;
+import ru.practicum.ewm.event.model.Location;
+
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UpdateEventAdminRequest {
+
+    @Size(min = 20, max = 2000)
+    private String annotation;
+
+    private Long category;
+
+    @Size(min = 20, max = 7000)
+    private String description;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Future
+    private LocalDateTime eventDate;
+
+    private Location location;
+
+    private Boolean paid;
+
+    private Integer participantLimit;
+
+    private Boolean requestModeration;
+
+    private AdminStateAction stateAction;  // PUBLISH_EVENT / REJECT_EVENT
+
+    @Size(min = 3, max = 120)
+    private String title;
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\dto\UpdateEventUserRequest.java
+==================================================
+package ru.practicum.ewm.event.dto;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.practicum.ewm.event.model.Location;
+import ru.practicum.ewm.event.model.UserStateAction;
+
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UpdateEventUserRequest {
+    @Size(min = 20, max = 2000)
+    private String annotation;
+
+    private Long category;
+
+    @Size(min = 20, max = 7000)
+    private String description;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Future
+    private LocalDateTime eventDate;
+
+    private Location location;
+
+    private Boolean paid;
+
+    @PositiveOrZero
+    private Integer participantLimit;
+
+    private Boolean requestModeration;
+
+    private UserStateAction stateAction;  // SEND_TO_REVIEW / CANCEL_REVIEW
+
+    @Size(min = 3, max = 120)
+    private String title;
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\dto\Viewable.java
+==================================================
+package ru.practicum.ewm.event.dto;
+
+
+import java.time.LocalDateTime;
+
+// СЌС‚РѕС‚ РёРЅС‚РµСЂС„РµР№СЃ РјС‹ РґРѕР±Р°РІР»СЏРµРј РґР»СЏ РїРѕР»РёРјРѕСЂС„РёР·РјР°, С‡С‚РѕР±С‹ РјРµС‚РѕРґ enrichEventsWithViews РІ СЃРµСЂРІРёСЃРµ РјРѕРі РїСЂРёРЅРёРјР°С‚СЊ Рё ShortDto Рё FullDto, РєРѕС‚РѕСЂРµ СЂРµР°Р»РёР·СѓСЋС‚ СЌС‚РѕС‚ РёРЅС‚РµСЂС„РµР№СЃ.
+public interface Viewable {
+    Long getId();
+
+    void setViews(Long views);
+
+    LocalDateTime getPublishedOn();
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\dto\paramDto\AdminUserEventParam.java
+==================================================
+package ru.practicum.ewm.event.dto.paramDto;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import ru.practicum.ewm.event.model.EventState;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@ValidDateRange // РєР°СЃС‚РѕРјРЅР°СЏ РІР°Р»РёРґР°С†РёСЏ РґР°С‚
+public class AdminUserEventParam implements DateRangeValidatable {
+
+    private List<Long> categories;
+
+    private List<Long> users;
+
+    private List<EventState> states;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime rangeStart;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime rangeEnd;
+
+    @Min(0)
+    @Builder.Default
+    private Integer from = 0;
+
+    @Positive
+    @Builder.Default
+    private Integer size = 10;
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\dto\paramDto\DateRangeValidatable.java
+==================================================
+package ru.practicum.ewm.event.dto.paramDto;
+
+
+import java.time.LocalDateTime;
+
+
+// РѕР±РѕР±С‰Р°СЋС‰РёР№ РёРЅС‚РµСЂС„РµР№СЃ РґР»СЏ AdminUserEventParam Рё PublicUserEventParam, С‡С‚РѕР±С‹ РёС… РѕР±РѕРёС… РјРѕР¶РЅРѕ Р±С‹Р»Рѕ РїСЂРѕРІРµСЂСЏС‚СЊ РІ РєР°СЃС‚РѕРјРЅРѕРј РІР°Р»РёРґР°С‚РѕСЂРµ
+public interface DateRangeValidatable {
+    LocalDateTime getRangeStart();
+
+    LocalDateTime getRangeEnd();
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\dto\paramDto\DateRangeValidator.java
+==================================================
+package ru.practicum.ewm.event.dto.paramDto;
+
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+
+import java.time.LocalDateTime;
+
+public class DateRangeValidator implements ConstraintValidator<ValidDateRange, DateRangeValidatable> {
+
+    @Override
+    public boolean isValid(DateRangeValidatable value, ConstraintValidatorContext context) {
+        if (value == null) return true;
+
+        LocalDateTime start = value.getRangeStart();
+        LocalDateTime end = value.getRangeEnd();
+
+        // Р•СЃР»Рё РѕРґРЅР° РёР· РґР°С‚ РЅРµ СѓРєР°Р·Р°РЅР°, С‚РѕРіРґР° РІСЃС‘ РѕРє
+        if (start == null || end == null) {
+            return true;
+        }
+
+        return start.isBefore(end);
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\dto\paramDto\EventRepositoryParam.java
+==================================================
+package ru.practicum.ewm.event.dto.paramDto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.practicum.ewm.event.model.EventSort;
+import ru.practicum.ewm.event.model.EventState;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+
+// РєР»Р°СЃСЃ РґР»СЏ РїРµСЂРµРґР°С‡Рё РїР°СЂР°РјРµС‚СЂРѕРІ РґР»СЏ РѕС‚Р±РѕСЂР° СЃРѕР±С‹С‚РёР№ РІ СЂРµРїРѕР·РёС‚РѕСЂРёР№
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class EventRepositoryParam {
+    private String text;
+    private List<Long> categories;
+    private List<Long> users;
+    private List<EventState> states;
+    private Boolean paid;
+    private LocalDateTime rangeStart;
+    private LocalDateTime rangeEnd;
+    private Boolean onlyAvailable;
+    private EventSort sort;
+    private Integer from;
+    private Integer size;
+    private boolean publicRequest; // СѓРєР°Р·С‹РІР°РµС‚ РЅР° Р·Р°РїСЂРѕСЃ СЃ РїСѓР±Р»РёС‡РЅРѕРіРѕ СЌРЅРґРїРѕРёРЅС‚Р°, С‚РѕРіРґР° РЅСѓР¶РЅС‹ С‚РѕР»СЊРєРѕ PUBLISHED СЃРѕР±С‹С‚РёСЏ
+    private List<Long> ids;
+
+    public static EventRepositoryParam fromUserEventParam(PublicUserEventParam userParam) {
+        return EventRepositoryParam.builder()
+                .text(userParam.getText())
+                .categories(userParam.getCategories())
+                .paid(userParam.getPaid())
+                .rangeStart(userParam.getRangeStart())
+                .rangeEnd(userParam.getRangeEnd())
+                .onlyAvailable(userParam.getOnlyAvailable())
+                .sort(userParam.getSort())
+                .from(userParam.getFrom())
+                .size(userParam.getSize())
+                .publicRequest(true)
+                .build();
+    }
+
+    public static EventRepositoryParam fromAdminEventParam(AdminUserEventParam adminParam) {
+        return EventRepositoryParam.builder()
+                .users(adminParam.getUsers())
+                .states(adminParam.getStates())
+                .categories(adminParam.getCategories())
+                .rangeStart(adminParam.getRangeStart())
+                .rangeEnd(adminParam.getRangeEnd())
+                .from(adminParam.getFrom())
+                .size(adminParam.getSize())
+                .build();
+    }
+
+    public boolean hasIds() {
+        return ids != null && !ids.isEmpty();
+    }
+
+    public boolean isPublicRequest() {
+        return publicRequest;
+    }
+
+    public boolean hasUsers() {
+        return users != null && !users.isEmpty();
+    }
+
+    public boolean hasStates() {
+        return states != null && !states.isEmpty();
+    }
+
+    public boolean hasPaidParam() {
+        return paid != null;
+    }
+
+    public boolean isOnlyAvailable() {
+        return onlyAvailable != null ? onlyAvailable : false;
+    }
+
+    public EventSort getSortOrDefault() {
+        return sort != null ? sort : EventSort.EVENT_DATE;
+    }
+
+    public boolean hasDateRange() {
+        return rangeStart != null && rangeEnd != null;
+    }
+
+    public boolean hasRangeStart() {
+        return rangeStart != null;
+    }
+
+    public boolean hasRangeEnd() {
+        return rangeEnd != null;
+    }
+
+    public boolean hasTextSearchRequest() {
+        return text != null && !text.isBlank();
+    }
+
+    public boolean hasCategories() {
+        return categories != null && !categories.isEmpty();
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\dto\paramDto\PublicUserEventParam.java
+==================================================
+package ru.practicum.ewm.event.dto.paramDto;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import ru.practicum.ewm.event.model.EventSort;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@ValidDateRange  // РєР°СЃС‚РѕРјРЅР°СЏ РІР°Р»РёРґР°С†РёСЏ РґР°С‚
+public class PublicUserEventParam implements DateRangeValidatable {
+
+    private String text;
+
+    private List<Long> categories;
+
+    private Boolean paid;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime rangeStart;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime rangeEnd;
+
+    @Builder.Default
+    private Boolean onlyAvailable = false;
+
+    @Builder.Default
+    private EventSort sort = EventSort.EVENT_DATE;
+
+    @Min(0)
+    @Builder.Default
+    private Integer from = 0;
+
+    @Positive
+    @Builder.Default
+    private Integer size = 10;
+
+    private String uri;
+
+    private String ip;
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\dto\paramDto\ValidDateRange.java
+==================================================
+package ru.practicum.ewm.event.dto.paramDto;
+
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
+
+import java.lang.annotation.*;
+
+@Target({ElementType.TYPE, ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy = DateRangeValidator.class)
+@Documented
+public @interface ValidDateRange {
+    String message() default "rangeStart must be before rangeEnd";
+
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\model\AdminStateAction.java
+==================================================
+package ru.practicum.ewm.event.model;
+
+public enum AdminStateAction {
+    PUBLISH_EVENT,
+    REJECT_EVENT
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\model\Event.java
+==================================================
+package ru.practicum.ewm.event.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+import ru.practicum.ewm.categories.model.Category;
+import ru.practicum.ewm.user.model.User;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "events")
+@Builder
+@Getter
+@Setter
+@ToString(onlyExplicitlyIncluded = true)  //  Р±РµР·РѕРїР°СЃРЅРѕ РґР»СЏ @OneToMany Рё lazy-Р·Р°РіСЂСѓР·РѕРє
+@NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA РѕР±СЏР·Р°РЅ РёРјРµС‚СЊ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
+@AllArgsConstructor  // РґР»СЏ Builder
+public class Event {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 2000)
+    private String annotation;
+
+    @Column(nullable = false, length = 7000)
+    private String description;
+
+    @Column(nullable = false, length = 120)
+    private String title;
+
+    @Column(name = "event_date", nullable = false)
+    private LocalDateTime eventDate;
+
+    @Column(name = "created_on", nullable = false)
+    private LocalDateTime createdOn;
+
+    @Column(name = "published_on")
+    private LocalDateTime publishedOn;
+
+    @Column(nullable = false)
+    private Boolean paid;
+
+    @Column(name = "participant_limit", nullable = false)
+    private Integer participantLimit; // (0 - РЅРµС‚ Р»РёРјРёС‚Р°)
+
+    @Column(name = "request_moderation", nullable = false)
+    private Boolean requestModeration;  // РЅСѓР¶РЅР° Р»Рё РїСЂРµ-РјРѕРґРµСЂР°С†РёСЏ Р·Р°СЏРІРѕРє
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EventState state;
+
+    // РЎРІСЏР·Рё
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "initiator_id", nullable = false)
+    private User initiator;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
+    @Embedded
+    private Location location;
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\model\EventSort.java
+==================================================
+package ru.practicum.ewm.event.model;
+
+public enum EventSort {
+    EVENT_DATE, VIEWS
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\model\EventState.java
+==================================================
+package ru.practicum.ewm.event.model;
+
+public enum EventState {
+    PENDING,
+    PUBLISHED,
+    CANCELED
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\model\Location.java
+==================================================
+package ru.practicum.ewm.event.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Embeddable
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Location {
+    @Column(name = "lat")
+    private Float lat;  // С€РёСЂРѕС‚Р°
+
+    @Column(name = "lon")
+    private Float lon;  // РґРѕР»РіРѕС‚Р°
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\model\UserStateAction.java
+==================================================
+package ru.practicum.ewm.event.model;
+
+public enum UserStateAction {
+    SEND_TO_REVIEW,
+    CANCEL_REVIEW
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\repository\EventRepository.java
+==================================================
+package ru.practicum.ewm.event.repository;
+
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import ru.practicum.ewm.event.model.Event;
+
+import java.util.Collection;
+import java.util.List;
+
+public interface EventRepository
+        extends JpaRepository<Event, Long>, EventRepositoryCustom {
+
+    @EntityGraph(attributePaths = {
+            "category",
+            "initiator"
+    })
+    List<Event> findAllByIdIn(Collection<Long> eventIds);
+
+    boolean existsByCategoryId(Long categoryId);
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\repository\EventRepositoryCustom.java
+==================================================
+package ru.practicum.ewm.event.repository;
+
+import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.dto.EventShortDto;
+import ru.practicum.ewm.event.dto.paramDto.EventRepositoryParam;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface EventRepositoryCustom {
+
+    List<EventShortDto> findEventsShortDto(EventRepositoryParam param);
+
+    Optional<EventFullDto> findEventByIdFullDto(Long id);
+
+    List<EventFullDto> findEventsFullDto(EventRepositoryParam param);
+
+    List<EventShortDto> findEventsShortDtoWithoutPagination(EventRepositoryParam param);
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\repository\EventRepositoryCustomImpl.java
+==================================================
+package ru.practicum.ewm.event.repository;
+
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+import ru.practicum.ewm.categories.dto.CategoryDto;
+import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.dto.EventShortDto;
+import ru.practicum.ewm.event.dto.paramDto.EventRepositoryParam;
+import ru.practicum.ewm.event.model.EventState;
+import ru.practicum.ewm.event.model.QEvent;
+import ru.practicum.ewm.user.dto.UserShortDto;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+@RequiredArgsConstructor
+public class EventRepositoryCustomImpl
+        implements EventRepositoryCustom {
+
+    private final JPAQueryFactory queryFactory;
+
+    private final QEvent event = QEvent.event;
+
+    @Override
+    public List<EventShortDto> findEventsShortDto(
+            EventRepositoryParam param
+    ) {
+        BooleanBuilder predicate = createPredicate(param);
+
+        return queryFactory
+                .select(
+                        Projections.constructor(
+                                EventShortDto.class,
+                                event.id,
+                                event.annotation,
+                                Projections.constructor(
+                                        CategoryDto.class,
+                                        event.category.id,
+                                        event.category.name
+                                ),
+                                Expressions.asNumber(0L),
+                                event.eventDate,
+                                Projections.constructor(
+                                        UserShortDto.class,
+                                        event.initiator.id,
+                                        event.initiator.name
+                                ),
+                                event.paid,
+                                event.publishedOn,
+                                event.title,
+                                Expressions.asNumber(0L),
+                                Expressions.asNumber(0L)
+                        )
+                )
+                .from(event)
+                .where(predicate)
+                .orderBy(event.eventDate.asc())
+                .offset(param.getFrom())
+                .limit(param.getSize())
+                .fetch();
+    }
+
+    @Override
+    public List<EventShortDto> findEventsShortDtoWithoutPagination(
+            EventRepositoryParam param
+    ) {
+        BooleanBuilder predicate = createPredicate(param);
+
+        return queryFactory
+                .select(
+                        Projections.constructor(
+                                EventShortDto.class,
+                                event.id,
+                                event.annotation,
+                                Projections.constructor(
+                                        CategoryDto.class,
+                                        event.category.id,
+                                        event.category.name
+                                ),
+                                Expressions.asNumber(0L),
+                                event.eventDate,
+                                Projections.constructor(
+                                        UserShortDto.class,
+                                        event.initiator.id,
+                                        event.initiator.name
+                                ),
+                                event.paid,
+                                event.publishedOn,
+                                event.title,
+                                Expressions.asNumber(0L),
+                                Expressions.asNumber(0L)
+                        )
+                )
+                .from(event)
+                .where(predicate)
+                .orderBy(event.eventDate.asc())
+                .fetch();
+    }
+
+    @Override
+    public Optional<EventFullDto> findEventByIdFullDto(
+            Long id
+    ) {
+        EventFullDto result = queryFactory
+                .select(
+                        Projections.constructor(
+                                EventFullDto.class,
+                                event.id,
+                                event.annotation,
+                                Projections.constructor(
+                                        CategoryDto.class,
+                                        event.category.id,
+                                        event.category.name
+                                ),
+                                Expressions.asNumber(0L),
+                                event.createdOn,
+                                event.description,
+                                event.eventDate,
+                                Projections.constructor(
+                                        UserShortDto.class,
+                                        event.initiator.id,
+                                        event.initiator.name
+                                ),
+                                event.location,
+                                event.paid,
+                                event.participantLimit,
+                                event.publishedOn,
+                                event.requestModeration,
+                                event.state,
+                                event.title,
+                                Expressions.asNumber(0L),
+                                Expressions.asNumber(0L)
+                        )
+                )
+                .from(event)
+                .where(event.id.eq(id))
+                .fetchOne();
+
+        return Optional.ofNullable(result);
+    }
+
+    @Override
+    public List<EventFullDto> findEventsFullDto(
+            EventRepositoryParam param
+    ) {
+        BooleanBuilder predicate = createPredicate(param);
+
+        return queryFactory
+                .select(
+                        Projections.constructor(
+                                EventFullDto.class,
+                                event.id,
+                                event.annotation,
+                                Projections.constructor(
+                                        CategoryDto.class,
+                                        event.category.id,
+                                        event.category.name
+                                ),
+                                Expressions.asNumber(0L),
+                                event.createdOn,
+                                event.description,
+                                event.eventDate,
+                                Projections.constructor(
+                                        UserShortDto.class,
+                                        event.initiator.id,
+                                        event.initiator.name
+                                ),
+                                event.location,
+                                event.paid,
+                                event.participantLimit,
+                                event.publishedOn,
+                                event.requestModeration,
+                                event.state,
+                                event.title,
+                                Expressions.asNumber(0L),
+                                Expressions.asNumber(0L)
+                        )
+                )
+                .from(event)
+                .where(predicate)
+                .orderBy(event.eventDate.asc())
+                .offset(param.getFrom())
+                .limit(param.getSize())
+                .fetch();
+    }
+
+    private BooleanBuilder createPredicate(
+            EventRepositoryParam param
+    ) {
+        BooleanBuilder predicate = new BooleanBuilder();
+
+        if (param.isPublicRequest()) {
+            predicate.and(
+                    event.state.eq(EventState.PUBLISHED)
+            );
+        } else if (param.hasStates()) {
+            predicate.and(
+                    event.state.in(param.getStates())
+            );
+        }
+
+        if (param.hasTextSearchRequest()) {
+            predicate.and(
+                    event.annotation
+                            .containsIgnoreCase(param.getText())
+                            .or(
+                                    event.description
+                                            .containsIgnoreCase(
+                                                    param.getText()
+                                            )
+                            )
+            );
+        }
+
+        if (param.hasCategories()) {
+            predicate.and(
+                    event.category.id.in(param.getCategories())
+            );
+        }
+
+        if (param.hasPaidParam()) {
+            predicate.and(
+                    event.paid.eq(param.getPaid())
+            );
+        }
+
+        if (param.hasUsers()) {
+            predicate.and(
+                    event.initiator.id.in(param.getUsers())
+            );
+        }
+
+        if (param.hasIds()) {
+            predicate.and(
+                    event.id.in(param.getIds())
+            );
+        }
+
+        if (param.hasDateRange()) {
+            predicate.and(
+                    event.eventDate.between(
+                            param.getRangeStart(),
+                            param.getRangeEnd()
+                    )
+            );
+        } else if (param.hasRangeStart()) {
+            predicate.and(
+                    event.eventDate.after(param.getRangeStart())
+            );
+        } else if (param.hasRangeEnd()) {
+            predicate.and(
+                    event.eventDate.before(param.getRangeEnd())
+            );
+        } else {
+            predicate.and(
+                    event.eventDate.after(LocalDateTime.now())
+            );
+        }
+
+        return predicate;
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\service\EventService.java
+==================================================
+package ru.practicum.ewm.event.service;
+
+import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.dto.EventShortDto;
+import ru.practicum.ewm.event.dto.NewEventDto;
+import ru.practicum.ewm.event.dto.UpdateEventAdminRequest;
+import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
+import ru.practicum.ewm.event.dto.paramDto.AdminUserEventParam;
+import ru.practicum.ewm.event.dto.paramDto.PublicUserEventParam;
+
+import java.util.Collection;
+import java.util.List;
+
+public interface EventService {
+
+    List<EventShortDto> getEventsForPublicRequests(
+            PublicUserEventParam param
+    );
+
+    List<EventFullDto> getEventsForAdminRequests(
+            AdminUserEventParam param
+    );
+
+    EventFullDto findEventById(
+            String uri,
+            String ip,
+            Long id
+    );
+
+    EventFullDto createEvent(
+            Long userId,
+            NewEventDto newEventDto
+    );
+
+    List<EventShortDto> getUserEvents(
+            Long userId,
+            int from,
+            int size
+    );
+
+    EventFullDto findUserEventByEventId(
+            Long userId,
+            Long eventId
+    );
+
+    EventFullDto updateUserEvent(
+            Long userId,
+            Long eventId,
+            UpdateEventUserRequest body
+    );
+
+    EventFullDto updateEvent(
+            Long eventId,
+            UpdateEventAdminRequest body
+    );
+
+    List<EventShortDto> getShortDtosByIds(
+            Collection<Long> eventIds
+    );
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\event\service\EventServiceImpl.java
+==================================================
+package ru.practicum.ewm.event.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.ewm.categories.model.Category;
+import ru.practicum.ewm.categories.repository.CategoryRepository;
+import ru.practicum.ewm.interaction.CommentCountProvider;
+import ru.practicum.ewm.event.dto.*;
+import ru.practicum.ewm.event.dto.paramDto.AdminUserEventParam;
+import ru.practicum.ewm.event.dto.paramDto.EventRepositoryParam;
+import ru.practicum.ewm.event.dto.paramDto.PublicUserEventParam;
+import ru.practicum.ewm.event.model.Event;
+import ru.practicum.ewm.event.model.EventSort;
+import ru.practicum.ewm.event.model.EventState;
+import ru.practicum.ewm.event.repository.EventRepository;
+import ru.practicum.ewm.exceptions.exceptions.ConditionsNotMetException;
+import ru.practicum.ewm.exceptions.exceptions.NotFoundException;
+import ru.practicum.ewm.interaction.RequestCountProvider;
+import ru.practicum.ewm.user.model.User;
+import ru.practicum.ewm.user.repository.UserRepository;
+import ru.practicum.stat.client.StatsClient;
+import ru.practicum.stat.dto.EndpointHitDto;
+import ru.practicum.stat.dto.ParamDto;
+import ru.practicum.stat.dto.ViewStatsDto;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
+
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class EventServiceImpl implements EventService {
+    private final EventRepository eventRepository;
+    private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
+    private final StatsClient statsClient;
+    private final CommentCountProvider commentCountProvider;
+    private final RequestCountProvider requestCountProvider;
+
+
+    @Transactional
+    @Override
+    public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
+        LocalDateTime minEventDate = LocalDateTime.now().plusHours(2);
+
+        if (newEventDto.getEventDate().isBefore(minEventDate)) {
+            throw new ConditionsNotMetException(
+                    "Unable to update event at last 2 hours before event date"
+            );
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                "User with id=" + userId + " was not found"
+                        ));
+
+        Category cat = categoryRepository.getCategory(newEventDto.getCategory());
+
+        Event event = EventMapper.toEvent(newEventDto, cat, user);
+
+        event = eventRepository.save(event);
+
+        return EventMapper.toEventFullDto(event, 0L, 0L);
+    }
+
+    @Override
+    public List<EventShortDto> getUserEvents(Long userId, int from, int size) {
+        EventRepositoryParam param = EventRepositoryParam.builder()
+                .users(List.of(userId))
+                .from(from)
+                .size(size)
+                .build();
+
+        List<EventShortDto> events = eventRepository.findEventsShortDto(param);
+        if (events.isEmpty()) {
+            return events;
+        }
+
+        enrichEventsWithViews(events);
+        enrichEventsListWithCommentsCount(events);
+
+        return events;
+    }
+
+    @Override
+    public List<EventShortDto> getEventsForPublicRequests(
+            PublicUserEventParam userEventParam
+    ) {
+        EventRepositoryParam param =
+                EventRepositoryParam.fromUserEventParam(
+                        userEventParam
+                );
+
+        boolean onlyAvailable =
+                Boolean.TRUE.equals(
+                        userEventParam.getOnlyAvailable()
+                );
+        List<EventShortDto> events = onlyAvailable
+                ? eventRepository
+                .findEventsShortDtoWithoutPagination(param)
+                : eventRepository.findEventsShortDto(param);
+
+        sendHit(
+                userEventParam.getUri(),
+                userEventParam.getIp(),
+                LocalDateTime.now()
+        );
+
+        if (events.isEmpty()) {
+            return events;
+        }
+
+        enrichEventsWithViews(events);
+        enrichEventsListWithCommentsCount(events);
+
+        if (param.getSortOrDefault() == EventSort.VIEWS) {
+            events.sort(
+                    Comparator.comparing(
+                                    EventShortDto::getViews,
+                                    Comparator.nullsFirst(
+                                            Comparator.naturalOrder()
+                                    )
+                            )
+                            .reversed()
+            );
+        }
+
+        if (onlyAvailable) {
+            events = filterAndPaginateAvailableEvents(
+                    events,
+                    userEventParam.getFrom(),
+                    userEventParam.getSize()
+            );
+        }
+
+        return events;
+    }
+
+    @Override
+    public List<EventFullDto> getEventsForAdminRequests(AdminUserEventParam adminParam) {
+        EventRepositoryParam param = EventRepositoryParam.fromAdminEventParam(adminParam);
+
+        List<EventFullDto> events = eventRepository.findEventsFullDto(param);
+        if (events.isEmpty()) {
+            return events;
+        }
+
+        enrichEventsWithViews(events);
+        enrichEventsListWithCommentsCount(events);
+
+        return events;
+    }
+
+    @Override
+    public EventFullDto findUserEventByEventId(Long userId, Long eventId) {
+
+        EventFullDto event = eventRepository.findEventByIdFullDto(eventId)
+                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
+
+        if (!event.getInitiator().getId().equals(userId)) {
+            throw new NotFoundException("Event with id=" + eventId + " not found for user with id=" + userId);
+        }
+
+        enrichEventWithViews(event);
+        enrichEventsListWithCommentsCount(List.of(event));
+
+        return event;
+    }
+
+    @Override
+    @Transactional
+    public EventFullDto updateUserEvent(Long userId, Long eventId, UpdateEventUserRequest body) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
+
+        if (!event.getInitiator().getId().equals(userId)) {
+            throw new NotFoundException("Event with id=" + eventId + " not found for user with id=" + userId);
+        }
+
+        if (event.getState().equals(EventState.PUBLISHED)) {
+            throw new ConditionsNotMetException("Only events with CANCELED or PENDING state can be updated");
+        }
+
+        LocalDateTime minEventDateForUpdating = LocalDateTime.now().plusHours(2);
+        if (event.getEventDate().isBefore(minEventDateForUpdating)) {
+            throw new ConditionsNotMetException("Unable to update event at last 2 hours before event date");
+        }
+
+        if (body.getEventDate() != null) {
+            LocalDateTime newEventDate = body.getEventDate();
+            if (newEventDate.isBefore(minEventDateForUpdating)) {
+                throw new ConditionsNotMetException("Unable to update event at last 2 hours before event date");
+            }
+
+        }
+
+        if (body.getStateAction() != null) {
+            switch (body.getStateAction()) {
+                case SEND_TO_REVIEW:
+                    if (event.getState() == EventState.CANCELED) {
+                        event.setState(EventState.PENDING);
+                    }
+                    break;
+                case CANCEL_REVIEW:
+                    if (event.getState() != EventState.PENDING) {
+                        throw new ConditionsNotMetException("Only events in PENDING state can be cancelled");
+                    }
+                    event.setState(EventState.CANCELED);
+                    break;
+                default:
+                    throw new ConditionsNotMetException("Unknown state action: " + body.getStateAction());
+            }
+        }
+
+        Category cat = null;
+        if (body.getCategory() != null) {
+            cat = categoryRepository.getCategory(body.getCategory());
+        }
+        EventMapper.updateEventFromUserRequest(body, event, cat);
+
+        event = eventRepository.save(event);
+
+        String[] uris = {"/events/" + event.getId()};
+        Map<Long, Long> hits = fetchViews(uris, event.getEventDate());
+        Long views = hits.getOrDefault(event.getId(), 0L);
+
+        long confirmedRequests =
+                requestCountProvider.getConfirmedRequests(eventId);
+
+        EventFullDto eventFullDto = EventMapper.toEventFullDto(event, confirmedRequests, views);
+        enrichEventsListWithCommentsCount(List.of(eventFullDto));
+
+        return eventFullDto;
+    }
+
+
+    @Override
+    @Transactional
+    public EventFullDto updateEvent(Long eventId, UpdateEventAdminRequest body) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
+
+        Category category = null;
+        if (body.getCategory() != null) {
+            category = categoryRepository.getCategory(body.getCategory());
+        }
+
+        EventMapper.updateEventFromAdminRequest(body, event, category);
+
+        if (body.getStateAction() != null) {
+            switch (body.getStateAction()) {
+                case PUBLISH_EVENT:
+                    if (event.getState() != EventState.PENDING) {
+                        String msg = "Cannot publish the event because it's not in the right state: " + event.getState();
+                        throw new ConditionsNotMetException(msg);
+                    }
+                    LocalDateTime minPublishDate = LocalDateTime.now().plusHours(1);
+                    if (event.getEventDate().isBefore(minPublishDate)) {
+                        throw new ConditionsNotMetException("Event date must be at least 1 hour from now");
+                    }
+                    event.setState(EventState.PUBLISHED);
+                    event.setPublishedOn(LocalDateTime.now());
+                    break;
+
+                case REJECT_EVENT:
+                    if (event.getState() == EventState.PUBLISHED) {
+                        throw new ConditionsNotMetException("Cannot reject published event");
+                    }
+                    event.setState(EventState.CANCELED);
+                    break;
+
+                default:
+                    throw new ConditionsNotMetException("Unknown state action: " + body.getStateAction());
+            }
+        }
+
+        event = eventRepository.save(event);
+
+        String[] uris = {"/events/" + event.getId()};
+        Map<Long, Long> hits = fetchViews(uris, event.getEventDate());
+        Long views = hits.getOrDefault(event.getId(), 0L);
+
+        long confirmedRequests =
+                requestCountProvider.getConfirmedRequests(eventId);
+
+        EventFullDto eventFullDto = EventMapper.toEventFullDto(event, confirmedRequests, views);
+        enrichEventsListWithCommentsCount(List.of(eventFullDto));
+
+        return eventFullDto;
+    }
+
+    public EventFullDto findEventById(String uri, String ip, Long id) {
+
+        EventFullDto event = eventRepository.findEventByIdFullDto(id)
+                .orElseThrow(() -> new NotFoundException("Event with id=" + id + " was not found"));
+
+        if (!event.getState().equals(EventState.PUBLISHED)) {
+            throw new NotFoundException("Published Event with id=" + id + " was not found");
+        }
+
+        sendHit(uri, ip, LocalDateTime.now());
+        enrichEventWithViews(event);
+        enrichEventsListWithCommentsCount(List.of(event));
+
+        return event;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EventShortDto> getShortDtosByIds(Collection<Long> eventIds) {
+        if (eventIds == null || eventIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Event> events = eventRepository.findAllByIdIn(eventIds);
+
+        if (events.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Map<Long, Event> eventsById = events.stream()
+                .collect(Collectors.toMap(
+                        Event::getId,
+                        event -> event
+                ));
+
+        List<EventShortDto> eventDtos = eventIds.stream()
+                .distinct()
+                .map(eventsById::get)
+                .filter(Objects::nonNull)
+                .map(event -> EventMapper.toEventShortDto(
+                        event,
+                        0L,
+                        0L
+                ))
+                .collect(Collectors.toList());
+
+        enrichEventsWithViews(eventDtos);
+        enrichEventsListWithCommentsCount(eventDtos);
+
+        return eventDtos;
+    }
+
+    private <T extends Viewable> void enrichEventsWithViews(List<T> events) {
+        LocalDateTime minEventDate = events.stream()
+                .map(Viewable::getPublishedOn)
+                .filter(Objects::nonNull)
+                .min(LocalDateTime::compareTo)
+                .orElse(null);
+
+        String[] uris = events.stream()
+                .map(e -> "/events/" + e.getId())
+                .toArray(String[]::new);
+
+        Map<Long, Long> hits = fetchViews(uris, minEventDate);
+
+        events.forEach(event ->
+                event.setViews(hits.getOrDefault(event.getId(), 0L))
+        );
+    }
+
+    private Map<Long, Long> fetchViews(
+            String[] uris,
+            LocalDateTime date
+    ) {
+        LocalDateTime start = date != null
+                ? date.truncatedTo(ChronoUnit.SECONDS)
+                : LocalDateTime.of(1970, 1, 1, 0, 0);
+
+        LocalDateTime end = LocalDateTime.now()
+                .plusSeconds(1)
+                .truncatedTo(ChronoUnit.SECONDS);
+
+        ParamDto statRequestParam = ParamDto.builder()
+                .start(start)
+                .end(end)
+                .uris(uris)
+                .unique(true)
+                .build();
+
+        log.debug(
+                "Fetching views: uris={}, start={}, end={}",
+                Arrays.toString(uris),
+                start,
+                end
+        );
+
+        try {
+            List<ViewStatsDto> stats =
+                    statsClient.get(statRequestParam);
+
+            log.debug("Stats received from client: {}", stats);
+
+            return stats.stream()
+                    .filter(stat -> stat.getUri() != null)
+                    .filter(stat -> stat.getHits() != null)
+                    .filter(stat -> stat.getHits() >= 0)
+                    .collect(Collectors.toMap(
+                            this::extractEventIdFromUri,
+                            ViewStatsDto::getHits,
+                            Long::sum
+                    ));
+        } catch (Exception exception) {
+            log.error(
+                    "Failed to fetch views from stats-server",
+                    exception
+            );
+
+            return Collections.emptyMap();
+        }
+    }
+
+    private void enrichEventWithViews(EventFullDto event) {
+        String[] uris = {"/events/" + event.getId()};
+        Map<Long, Long> hits = fetchViews(uris, event.getPublishedOn());
+        event.setViews(hits.getOrDefault(event.getId(), 0L));
+    }
+
+    private Long extractEventIdFromUri(ViewStatsDto stat) {
+        String uri = stat.getUri();
+        return Long.parseLong(uri.substring(uri.lastIndexOf('/') + 1));
+    }
+
+    private void sendHit(String uri, String ip, LocalDateTime time) {
+        EndpointHitDto hitDto = EndpointHitDto.builder()
+                .uri(uri)
+                .ip(ip)
+                .timestamp(time)
+                .build();
+
+        statsClient.hit(hitDto);
+    }
+
+    private <T extends EventCountsAware>
+    void enrichEventsListWithCommentsCount(
+            List<T> eventDtos
+    ) {
+        if (eventDtos == null || eventDtos.isEmpty()) {
+            return;
+        }
+        requestCountProvider.enrich(eventDtos);
+        commentCountProvider.enrich(eventDtos);
+    }
+
+    private List<EventShortDto>
+    filterAndPaginateAvailableEvents(
+            List<EventShortDto> events,
+            int from,
+            int size
+    ) {
+        if (events == null || events.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Long> eventIds = events.stream()
+                .map(EventShortDto::getId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        Map<Long, Integer> participantLimits =
+                eventRepository.findAllByIdIn(eventIds)
+                        .stream()
+                        .collect(Collectors.toMap(
+                                Event::getId,
+                                event -> event.getParticipantLimit() == null
+                                        ? 0
+                                        : event.getParticipantLimit()
+                        ));
+
+        return events.stream()
+                .filter(eventDto -> {
+                    int participantLimit =
+                            participantLimits.getOrDefault(
+                                    eventDto.getId(),
+                                    0
+                            );
+
+                    long confirmedRequests =
+                            eventDto.getConfirmedRequests() == null
+                                    ? 0L
+                                    : eventDto.getConfirmedRequests();
+
+                    return participantLimit == 0
+                            || confirmedRequests < participantLimit;
+                })
+                .skip(from)
+                .limit(size)
+                .collect(Collectors.toList());
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\categories\controller\AdminCategoryController.java
+==================================================
+package ru.practicum.ewm.categories.controller;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.categories.dto.CategoryDto;
+import ru.practicum.ewm.categories.dto.NewCategoryDto;
+import ru.practicum.ewm.categories.service.CategoryService;
+
+@RestController
+@RequestMapping("/admin/categories")
+@RequiredArgsConstructor
+public class AdminCategoryController {
+
+    private final CategoryService categoryService;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public CategoryDto postCategory(@RequestBody @Valid NewCategoryDto newCategoryDto) {
+        return categoryService.postCategory(newCategoryDto);
+    }
+
+    @DeleteMapping(path = "/{catId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCategory(@PathVariable Long catId) {
+        categoryService.deleteCategory(catId);
+    }
+
+    @PatchMapping(path = "/{catId}")
+    public CategoryDto patchCategory(@PathVariable Long catId,
+                                     @RequestBody @Valid NewCategoryDto newCategoryDto) {
+        return categoryService.patchCategory(catId, newCategoryDto);
+    }
+
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\categories\controller\PublicCategoryController.java
+==================================================
+package ru.practicum.ewm.categories.controller;
+
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.categories.dto.CategoryDto;
+import ru.practicum.ewm.categories.service.CategoryService;
+
+import java.util.List;
+
+@Validated
+@RestController
+@RequestMapping("/categories")
+@RequiredArgsConstructor
+public class PublicCategoryController {
+
+    private final CategoryService categoryService;
+
+    @GetMapping
+    public List<CategoryDto> getCategories(@RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                           @RequestParam(defaultValue = "10") @Positive int size) {
+        return categoryService.getCategories(from, size);
+    }
+
+    @GetMapping(path = "/{catId}")
+    public CategoryDto getCategory(@PathVariable Long catId) {
+        return categoryService.getCategory(catId);
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\categories\dto\CategoryDto.java
+==================================================
+package ru.practicum.ewm.categories.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CategoryDto {
+    private Long id;
+
+    @NotBlank
+    @Size(min = 1, max = 50)
+    private String name;
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\categories\dto\CategoryMapper.java
+==================================================
+package ru.practicum.ewm.categories.dto;
+
+import ru.practicum.ewm.categories.model.Category;
+
+public class CategoryMapper {
+    public static Category toCategory(CategoryDto categoryDto) {
+        return Category.builder()
+                .id(categoryDto.getId())
+                .name(categoryDto.getName())
+                .build();
+    }
+
+    public static Category toCategory(NewCategoryDto newCategoryDto) {
+        return Category.builder()
+                .name(newCategoryDto.getName())
+                .build();
+    }
+
+    public static CategoryDto toCategoryDto(Category category) {
+        return CategoryDto.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .build();
+    }
+
+    public static NewCategoryDto toNewCategoryDto(Category category) {
+        return NewCategoryDto.builder()
+                .name(category.getName())
+                .build();
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\categories\dto\NewCategoryDto.java
+==================================================
+package ru.practicum.ewm.categories.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class NewCategoryDto {
+    @NotBlank
+    @Size(min = 1, max = 50)
+    private String name;
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\categories\model\Category.java
+==================================================
+package ru.practicum.ewm.categories.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "categories")
+@Builder
+@Getter
+@Setter
+@ToString(onlyExplicitlyIncluded = true)  //  Р±РµР·РѕРїР°СЃРЅРѕ РґР»СЏ @OneToMany Рё lazy-Р·Р°РіСЂСѓР·РѕРє
+@NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA РѕР±СЏР·Р°РЅ РёРјРµС‚СЊ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
+@AllArgsConstructor  // РґР»СЏ Builder
+public class Category {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 50, unique = true)
+    private String name;
+
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\categories\repository\CategoryRepository.java
+==================================================
+package ru.practicum.ewm.categories.repository;
+
+import ru.practicum.ewm.categories.model.Category;
+
+import java.util.List;
+
+public interface CategoryRepository {
+
+    Category postCategory(Category category);
+
+    void deleteCategory(Long catId);
+
+    Category patchCategory(Long catId, Category category);
+
+    List<Category> getCategories(int from, int size);
+
+    Category getCategory(Long catId);
+
+    boolean existsById(Long catId);
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\categories\repository\CategoryRepositoryImpl.java
+==================================================
+package ru.practicum.ewm.categories.repository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
+import ru.practicum.ewm.categories.model.Category;
+
+import java.sql.PreparedStatement;
+import java.util.List;
+import java.util.Objects;
+
+@Slf4j
+@Repository
+@RequiredArgsConstructor
+public class CategoryRepositoryImpl implements CategoryRepository {
+
+    private final JdbcTemplate jdbcTemplate;
+
+    @Override
+    public Category postCategory(Category category) {
+        String sql = "INSERT INTO categories (name) VALUES (?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(con -> {
+            PreparedStatement ps = con.prepareStatement(sql, new String[]{"id"});  // Р·Р°РјРµРЅРёР» Statement.RETURN_GENERATED_KEYS, РІ postgres РЅРµ СЂР°Р±РѕС‚Р°РµС‚ РёРЅР°С‡Рµ
+            ps.setString(1, category.getName());
+            return ps;
+        }, keyHolder);
+
+        category.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
+        return category;
+    }
+
+    @Override
+    public void deleteCategory(Long catId) {
+        String sql = "DELETE FROM categories WHERE id = ?";
+        jdbcTemplate.update(sql, catId);
+    }
+
+    @Override
+    public Category patchCategory(Long catId, Category category) {
+        String sql = "UPDATE categories SET name = ? WHERE id = ?";
+        jdbcTemplate.update(sql, category.getName(), catId);
+        return new Category(catId, category.getName());
+    }
+
+    @Override
+    public List<Category> getCategories(int from, int size) {
+        String sql = "SELECT * FROM categories ORDER BY id LIMIT ? OFFSET ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new Category(
+                rs.getLong("id"),
+                rs.getString("name")
+        ), size, from);
+    }
+
+    @Override
+    public Category getCategory(Long catId) {
+        String sql = "SELECT * FROM categories WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> new Category(
+                rs.getLong("id"),
+                rs.getString("name")
+        ), catId);
+    }
+
+    @Override
+    public boolean existsById(Long catId) {
+        String sql = "SELECT COUNT(*) FROM categories WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, catId);
+        return count > 0;
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\categories\service\CategoryService.java
+==================================================
+package ru.practicum.ewm.categories.service;
+
+import ru.practicum.ewm.categories.dto.CategoryDto;
+import ru.practicum.ewm.categories.dto.NewCategoryDto;
+
+import java.util.List;
+
+public interface CategoryService {
+
+    CategoryDto postCategory(NewCategoryDto newCategoryDto);
+
+    void deleteCategory(Long catId);
+
+    CategoryDto patchCategory(Long catId, NewCategoryDto newCategoryDto);
+
+    List<CategoryDto> getCategories(int from, int size);
+
+    CategoryDto getCategory(Long catId);
+
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\categories\service\CategoryServiceImpl.java
+==================================================
+package ru.practicum.ewm.categories.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import ru.practicum.ewm.categories.dto.CategoryDto;
+import ru.practicum.ewm.categories.dto.CategoryMapper;
+import ru.practicum.ewm.categories.dto.NewCategoryDto;
+import ru.practicum.ewm.categories.model.Category;
+import ru.practicum.ewm.categories.repository.CategoryRepository;
+import ru.practicum.ewm.event.repository.EventRepository;
+import ru.practicum.ewm.exceptions.exceptions.ConditionsNotMetException;
+import ru.practicum.ewm.exceptions.exceptions.NotFoundException;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class CategoryServiceImpl implements CategoryService {
+
+    private final CategoryRepository categoryRepository;
+    private final EventRepository eventRepository;
+
+    @Override
+    public CategoryDto postCategory(NewCategoryDto newCategoryDto) {
+        Category category = CategoryMapper.toCategory(newCategoryDto);
+        return CategoryMapper.toCategoryDto(categoryRepository.postCategory(category));
+    }
+
+    @Override
+    public void deleteCategory(Long catId) {
+        if (!categoryRepository.existsById(catId)) {
+            throw new NotFoundException("РљР°С‚РµРіРѕСЂРёСЏ СЃ id = " + catId + " РЅРµ РЅР°Р№РґРµРЅР°");
+        }
+        if (eventRepository.existsByCategoryId(catId)) {
+            throw new ConditionsNotMetException("Р•СЃС‚СЊ СЃРѕР±С‹С‚РёСЏ РІ СЌС‚РѕР№ РєР°С‚РµРіРѕСЂРёРё, СѓРґР°Р»РёС‚СЊ РЅРµР»СЊР·СЏ");
+        }
+        categoryRepository.deleteCategory(catId);
+    }
+
+    @Override
+    public CategoryDto patchCategory(Long catId, NewCategoryDto newCategoryDto) {
+        if (!categoryRepository.existsById(catId)) {
+            throw new NotFoundException("РљР°С‚РµРіРѕСЂРёСЏ СЃ id = " + catId + " РЅРµ РЅР°Р№РґРµРЅР°");
+        }
+        Category category = CategoryMapper.toCategory(newCategoryDto);
+        Category updated = categoryRepository.patchCategory(catId, category);
+        return CategoryMapper.toCategoryDto(updated);
+    }
+
+    @Override
+    public List<CategoryDto> getCategories(int from, int size) {
+        return categoryRepository.getCategories(from, size).stream().map(CategoryMapper::toCategoryDto).toList();
+    }
+
+    @Override
+    public CategoryDto getCategory(Long catId) {
+        if (!categoryRepository.existsById(catId)) {
+            throw new NotFoundException("РљР°С‚РµРіРѕСЂРёСЏ СЃ id = " + catId + " РЅРµ РЅР°Р№РґРµРЅР°");
+        }
+        return CategoryMapper.toCategoryDto(categoryRepository.getCategory(catId));
+    }
+
+
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\compilation\controllers\AdminCompilationController.java
+==================================================
+package ru.practicum.ewm.compilation.controllers;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.compilation.service.CompilationService;
+import ru.practicum.ewm.compilation.dto.CompilationDto;
+import ru.practicum.ewm.compilation.dto.NewCompilationDto;
+import ru.practicum.ewm.compilation.dto.UpdateCompilationRequest;
+
+@RestController
+@RequestMapping("/admin/compilations")
+@RequiredArgsConstructor
+public class AdminCompilationController {
+    private final CompilationService compilationService;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public CompilationDto postCompilation(@RequestBody @Valid NewCompilationDto newCompilationDto) {
+        return compilationService.postCompilation(newCompilationDto);
+    }
+
+    @DeleteMapping("/{compId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCompilation(@PathVariable Long compId) {
+        compilationService.deleteCompilation(compId);
+    }
+
+    @PatchMapping("/{compId}")
+    public CompilationDto patchCompilation(@PathVariable Long compId,
+                                           @RequestBody @Valid UpdateCompilationRequest updateRequest) {
+        return compilationService.patchCompilation(compId, updateRequest);
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\compilation\controllers\PublicCompilationController.java
+==================================================
+package ru.practicum.ewm.compilation.controllers;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.ewm.compilation.dto.CompilationDto;
+import ru.practicum.ewm.compilation.service.CompilationService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/compilations")
+@RequiredArgsConstructor
+@Validated
+public class PublicCompilationController {
+
+    private final CompilationService compilationService;
+
+    @GetMapping
+    public List<CompilationDto> getCompilations(
+            @RequestParam(required = false) Boolean pinned,
+            @RequestParam(defaultValue = "0") @Min(0) int from,
+            @RequestParam(defaultValue = "10") @Positive int size
+    ) {
+        return compilationService.getCompilations(pinned, from, size);
+    }
+
+    @GetMapping("/{compId}")
+    public CompilationDto getCompilationById(@PathVariable Long compId) {
+        return compilationService.getCompilationById(compId);
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\compilation\dto\CompilationDto.java
+==================================================
+package ru.practicum.ewm.compilation.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.practicum.ewm.event.dto.EventShortDto;
+
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CompilationDto {
+    private Long id;
+    private List<EventShortDto> events;
+    private Boolean pinned;
+    private String title;
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\compilation\dto\CompilationMapper.java
+==================================================
+package ru.practicum.ewm.compilation.dto;
+
+import ru.practicum.ewm.compilation.model.Compilation;
+import ru.practicum.ewm.event.dto.EventShortDto;
+import ru.practicum.ewm.event.model.Event;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class CompilationMapper {
+
+    public static Compilation toCompilation(NewCompilationDto dto) {
+        return Compilation.builder()
+                .title(dto.getTitle())
+                .pinned(dto.getPinned() != null && dto.getPinned())
+                .events(dto.getEvents() != null ?
+                        dto.getEvents().stream()
+                                .map(id -> Event.builder().id(id).build())
+                                .toList() : new ArrayList<>())
+                .build();
+    }
+
+    public static void updateCompilationFromRequest(UpdateCompilationRequest request, Compilation compilation) {
+        if (request.getTitle() != null) {
+            compilation.setTitle(request.getTitle());
+        }
+
+        if (request.getPinned() != null) {
+            compilation.setPinned(request.getPinned());
+        }
+
+        if (request.getEvents() != null) {
+        // С‚.Рє. СЃРІСЏР·СЊ РјРЅРѕРіРёРµ-РєРѕ-РјРЅРѕРіРёРј, РґР»СЏ СЃРѕР·РґР°РЅРёСЏ Р·Р°РїРёСЃРё РІ РїСЂРѕРјРµР¶. С‚Р°Р±Р»РёС†Рµ РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РїСЂРѕСЃС‚Рѕ id, Р±РµР· РѕСЃС‚Р°Р»СЊРЅС‹С… РїРѕР»РµР№.
+            List<Event> newEvents = request.getEvents().stream()
+                    .map(id -> Event.builder().id(id).build())
+                    .toList();
+
+            compilation.setEvents(newEvents);
+        }
+    }
+
+    public static CompilationDto toCompilationDto(Compilation compilation, List<EventShortDto> events) {
+        return CompilationDto.builder()
+                .id(compilation.getId())
+                .title(compilation.getTitle())
+                .pinned(compilation.getPinned())
+                .events(events)
+                .build();
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\compilation\dto\NewCompilationDto.java
+==================================================
+package ru.practicum.ewm.compilation.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class NewCompilationDto {
+    private List<Long> events;  // СЃРїРёСЃРѕРє id СЃРѕР±С‹С‚РёР№ РґР»СЏ РїРѕРґР±РѕСЂРєРё
+
+    private Boolean pinned;  // РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ false
+
+    @NotBlank
+    @Size(min = 1, max = 50)
+    private String title;
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\compilation\dto\UpdateCompilationRequest.java
+==================================================
+package ru.practicum.ewm.compilation.dto;
+
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UpdateCompilationRequest {
+    private List<Long> events;  // СЃРїРёСЃРѕРє id СЃРѕР±С‹С‚РёР№
+    private Boolean pinned;
+
+    @Size(min = 1, max = 50)
+    private String title;
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\compilation\model\Compilation.java
+==================================================
+package ru.practicum.ewm.compilation.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import ru.practicum.ewm.event.model.Event;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "compilations")
+@Builder
+@Getter
+@Setter
+@ToString(onlyExplicitlyIncluded = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+public class Compilation {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 50)
+    private String title;
+
+    @Column(nullable = false)
+    private Boolean pinned;
+
+    @Builder.Default
+    @ManyToMany
+    @JoinTable(
+            name = "compilation_events",
+            joinColumns = @JoinColumn(name = "compilation_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id")
+    )
+    private List<Event> events = new ArrayList<>();
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\compilation\repository\CompilationRepository.java
+==================================================
+package ru.practicum.ewm.compilation.repository;
+
+import ru.practicum.ewm.compilation.model.Compilation;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface CompilationRepository {
+    Compilation postCompilation(Compilation compilation);
+
+    void deleteCompilation(Long comId);
+
+    Compilation patchCompilation(Long comId, Compilation compilation);
+
+    List<Compilation> getCompilations(Boolean pinned, int from, int size);
+
+    Optional<Compilation> getCompilationById(Long compId);
+
+    boolean existsById(Long compId);
+
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\compilation\repository\CompilationRepositoryImpl.java
+==================================================
+package ru.practicum.ewm.compilation.repository;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
+import ru.practicum.ewm.compilation.model.Compilation;
+import ru.practicum.ewm.event.model.Event;
+
+import java.sql.PreparedStatement;
+import java.util.*;
+
+@Repository
+@RequiredArgsConstructor
+public class CompilationRepositoryImpl implements CompilationRepository {
+
+    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    @Override
+    public Compilation postCompilation(Compilation compilation) {
+        String sql = "INSERT INTO compilations (title, pinned) VALUES (?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(con -> {
+            PreparedStatement ps = con.prepareStatement(sql, new String[]{"id"});
+            ps.setString(1, compilation.getTitle());
+            ps.setBoolean(2, compilation.getPinned());
+            return ps;
+        }, keyHolder);
+
+        Long compId = Objects.requireNonNull(keyHolder.getKey()).longValue();
+        compilation.setId(compId);
+
+        if (compilation.getEvents() != null && !compilation.getEvents().isEmpty()) {
+            saveEventsRelations(compId, compilation.getEvents());
+        }
+
+        return compilation;
+    }
+
+    @Override
+    public void deleteCompilation(Long comId) {
+        String sql = "DELETE FROM compilations WHERE id = ?";
+        jdbcTemplate.update(sql, comId);
+    }
+
+    @Override
+    public Compilation patchCompilation(Long compId, Compilation compilation) {
+        if (compilation.getTitle() != null) {
+            jdbcTemplate.update("UPDATE compilations SET title = ? WHERE id = ?", compilation.getTitle(), compId);
+        }
+        if (compilation.getPinned() != null) {
+            jdbcTemplate.update("UPDATE compilations SET pinned = ? WHERE id = ?", compilation.getPinned(), compId);
+        }
+
+        if (compilation.getEvents() != null) {
+            jdbcTemplate.update("DELETE FROM compilation_events WHERE compilation_id = ?", compId);
+            if (!compilation.getEvents().isEmpty()) {
+                saveEventsRelations(compId, compilation.getEvents());
+            }
+        }
+        compilation.setId(compId);
+        return compilation;
+    }
+
+    @Override
+    public List<Compilation> getCompilations(Boolean pinned, int from, int size) {
+        String sql = "SELECT * FROM compilations ";
+        List<Object> params = new ArrayList<>();
+
+        if (pinned != null) {
+            sql += "WHERE pinned = ?";
+            params.add(pinned);
+        }
+        sql += " ORDER BY id LIMIT ? OFFSET ?";
+        params.add(size);
+        params.add(from);
+
+        List<Compilation> compilations = jdbcTemplate.query(sql, (rs, rowNum) ->
+                        Compilation.builder()
+                                .id(rs.getLong("id"))
+                                .title(rs.getString("title"))
+                                .pinned(rs.getBoolean("pinned"))
+                                .build(),
+                params.toArray()
+        );
+
+        if (compilations.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Long> compIds = compilations.stream()
+                .map(Compilation::getId)
+                .toList();
+
+        String eventsSql = "SELECT compilation_id, event_id FROM compilation_events WHERE compilation_id IN (:ids)";
+
+        Map<Long, List<Event>> eventsByCompId = new HashMap<>();
+
+        namedParameterJdbcTemplate.query(eventsSql, Map.of("ids", compIds), rs -> {
+            long compId = rs.getLong("compilation_id");
+            long eventId = rs.getLong("event_id");
+            eventsByCompId.computeIfAbsent(compId, k -> new ArrayList<>())
+                    .add(Event.builder().id(eventId).build());
+        });
+
+        for (Compilation comp : compilations) {
+            comp.setEvents(eventsByCompId.getOrDefault(comp.getId(), Collections.emptyList()));
+        }
+        return compilations;
+    }
+
+    @Override
+    public Optional<Compilation> getCompilationById(Long compId) {
+        String sqlComp = "SELECT * FROM compilations WHERE id = ?";
+        String sqlEvents =
+                "SELECT event_id FROM compilation_events WHERE compilation_id = ?";
+
+        try {
+            Compilation compilation = jdbcTemplate.queryForObject(
+                    sqlComp,
+                    (rs, rowNum) -> Compilation.builder()
+                            .id(rs.getLong("id"))
+                            .title(rs.getString("title"))
+                            .pinned(rs.getBoolean("pinned"))
+                            .build(),
+                    compId
+            );
+
+            if (compilation == null) {
+                return Optional.empty();
+            }
+
+            List<Long> eventIds = jdbcTemplate.queryForList(
+                    sqlEvents,
+                    Long.class,
+                    compId
+            );
+
+            compilation.setEvents(
+                    eventIds.stream()
+                            .map(eventId -> Event.builder()
+                                    .id(eventId)
+                                    .build())
+                            .toList()
+            );
+
+            return Optional.of(compilation);
+
+        } catch (EmptyResultDataAccessException ex) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public boolean existsById(Long comId) {
+        String sql = "SELECT COUNT(*) FROM compilations WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, comId);
+        return count > 0;
+    }
+
+    private void saveEventsRelations(Long compId, List<Event> events) {
+        String sql = "INSERT INTO compilation_events (compilation_id, event_id) VALUES (?, ?)";
+
+        jdbcTemplate.batchUpdate(sql, events, events.size(), (ps, event) -> {
+            ps.setLong(1, compId);
+            ps.setLong(2, event.getId());
+        });
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\compilation\service\CompilationService.java
+==================================================
+package ru.practicum.ewm.compilation.service;
+
+import ru.practicum.ewm.compilation.dto.CompilationDto;
+import ru.practicum.ewm.compilation.dto.NewCompilationDto;
+import ru.practicum.ewm.compilation.dto.UpdateCompilationRequest;
+
+import java.util.List;
+
+public interface CompilationService {
+    CompilationDto postCompilation(NewCompilationDto newCompilationDto);
+
+    void deleteCompilation(Long compId);
+
+    CompilationDto patchCompilation(Long compId, UpdateCompilationRequest updateRequest);
+
+    List<CompilationDto> getCompilations(Boolean pinned, int from, int size);
+
+    CompilationDto getCompilationById(Long compId);
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\compilation\service\CompilationServiceImpl.java
+==================================================
+package ru.practicum.ewm.compilation.service;
+
+import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import ru.practicum.ewm.compilation.dto.CompilationMapper;
+import ru.practicum.ewm.compilation.repository.CompilationRepository;
+import ru.practicum.ewm.compilation.dto.CompilationDto;
+import ru.practicum.ewm.compilation.dto.NewCompilationDto;
+import ru.practicum.ewm.compilation.dto.UpdateCompilationRequest;
+import ru.practicum.ewm.compilation.model.Compilation;
+import ru.practicum.ewm.event.dto.EventShortDto;
+import ru.practicum.ewm.event.model.Event;
+import ru.practicum.ewm.event.service.EventService;
+import ru.practicum.ewm.exceptions.exceptions.NotFoundException;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class CompilationServiceImpl implements CompilationService {
+    private final CompilationRepository compilationRepository;
+    private final EventService eventService;
+
+    @Override
+    @Transactional
+    public CompilationDto postCompilation(NewCompilationDto newCompilationDto) {
+        Compilation compilation = CompilationMapper.toCompilation(newCompilationDto);
+        Compilation saved = compilationRepository.postCompilation(compilation);
+
+        List<Long> eventIds = saved.getEvents().stream()
+                .map(Event::getId)
+                .toList();
+
+        List<EventShortDto> eventDtos = getEventShortDtos(eventIds);
+
+        return CompilationMapper.toCompilationDto(saved, eventDtos);
+    }
+
+    @Override
+    @Transactional
+    public void deleteCompilation(Long compId) {
+        if (!compilationRepository.existsById(compId)) {
+            throw new NotFoundException("РџРѕРґР±РѕСЂРєР° РЅРµ РЅР°Р№РґРµРЅР°");
+        }
+        compilationRepository.deleteCompilation(compId);
+    }
+
+    @Override
+    @Transactional
+    public CompilationDto patchCompilation(Long compId, UpdateCompilationRequest updateRequest) {
+        Compilation compilation = compilationRepository.getCompilationById(compId)
+                .orElseThrow(() -> new NotFoundException("РџРѕРґР±РѕСЂРєР° СЃ id=" + compId + " РЅРµ РЅР°Р№РґРµРЅР°"));
+
+        CompilationMapper.updateCompilationFromRequest(updateRequest, compilation);
+
+        Compilation updated = compilationRepository.patchCompilation(compId, compilation);
+
+        List<Long> eventIds = updated.getEvents().stream()
+                .map(Event::getId)
+                .toList();
+        List<EventShortDto> eventDtos = getEventShortDtos(eventIds);
+
+        return CompilationMapper.toCompilationDto(updated, eventDtos);
+    }
+
+
+    @Override
+    public List<CompilationDto> getCompilations(Boolean pinned, int from, int size) {
+        List<Compilation> compilations = compilationRepository.getCompilations(pinned, from, size);
+
+        Set<Long> allEventIds = compilations.stream()
+                .flatMap(c -> c.getEvents().stream().map(Event::getId))
+                .collect(Collectors.toSet());
+
+        Map<Long, EventShortDto> eventsMap = eventService.getShortDtosByIds(allEventIds)
+                .stream()
+                .collect(Collectors.toMap(EventShortDto::getId, e -> e));
+
+        return compilations.stream()
+                .map(c -> {
+                    List<EventShortDto> compEvents = c.getEvents().stream()
+                            .map(Event::getId)
+                            .map(eventsMap::get)
+                            .filter(Objects::nonNull)
+                            .toList();
+                    return CompilationMapper.toCompilationDto(c, compEvents);
+                })
+                .toList();
+    }
+
+    @Override
+    public CompilationDto getCompilationById(Long compId) {
+        Compilation compilation = compilationRepository.getCompilationById(compId)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                "Compilation with id=" + compId + " was not found"
+                        ));
+
+        List<Long> eventIds = compilation.getEvents().stream()
+                .map(Event::getId)
+                .toList();
+
+        List<EventShortDto> events = eventService.getShortDtosByIds(eventIds);
+
+        return CompilationMapper.toCompilationDto(compilation, events);
+    }
+
+    private List<EventShortDto> getEventShortDtos(List<Long> eventIds) {
+        if (eventIds == null || eventIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return eventService.getShortDtosByIds(eventIds);
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\interaction\CommentCountProvider.java
+==================================================
+package ru.practicum.ewm.interaction;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import ru.practicum.ewm.event.dto.EventCountsAware;
+import ru.practicum.ewm.interaction.client.CommentServiceClient;
+import ru.practicum.interaction.comment.ApprovedCommentsResponse;
+import ru.practicum.interaction.comment.CommentEventIdsRequest;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+@Service
+@RequiredArgsConstructor
+public class CommentCountProvider {
+
+    private final CommentServiceClient commentServiceClient;
+
+    /**
+     * РџРѕР»СѓС‡Р°РµС‚ РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРґРѕР±СЂРµРЅРЅС‹С… РєРѕРјРјРµРЅС‚Р°СЂРёРµРІ
+     * РґР»СЏ РІСЃРµРіРѕ СЃРїРёСЃРєР° СЃРѕР±С‹С‚РёР№ РѕРґРЅРёРј HTTP-Р·Р°РїСЂРѕСЃРѕРј.
+     */
+    public void enrich(
+            List<? extends EventCountsAware> eventDtos
+    ) {
+        if (eventDtos == null || eventDtos.isEmpty()) {
+            return;
+        }
+
+        List<Long> eventIds = eventDtos.stream()
+                .map(EventCountsAware::getId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        Map<Long, Long> counts = getCounts(eventIds);
+
+        eventDtos.forEach(eventDto ->
+                eventDto.setCommentsCount(
+                        counts.getOrDefault(
+                                eventDto.getId(),
+                                0L
+                        )
+                )
+        );
+    }
+
+    private Map<Long, Long> getCounts(
+            List<Long> eventIds
+    ) {
+        if (eventIds == null || eventIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        CommentEventIdsRequest request =
+                CommentEventIdsRequest.builder()
+                        .eventIds(eventIds)
+                        .build();
+
+        ApprovedCommentsResponse response =
+                commentServiceClient
+                        .getApprovedCommentCounts(request);
+
+        if (response == null
+                || response.getApprovedComments() == null) {
+
+            return Collections.emptyMap();
+        }
+
+        return response.getApprovedComments();
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\interaction\InternalInteractionController.java
+==================================================
+package ru.practicum.ewm.interaction;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.interaction.event.EventDetailsDto;
+import ru.practicum.interaction.user.UserDetailsDto;
+
+@RestController
+@RequestMapping("/internal")
+@RequiredArgsConstructor
+public class InternalInteractionController {
+
+    private final InternalInteractionService interactionService;
+
+    @GetMapping("/users/{userId}")
+    public UserDetailsDto getUser(
+            @PathVariable Long userId
+    ) {
+        return interactionService.getUser(userId);
+    }
+
+    @GetMapping("/events/{eventId}")
+    public EventDetailsDto getEvent(
+            @PathVariable Long eventId
+    ) {
+        return interactionService.getEvent(eventId);
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\interaction\InternalInteractionService.java
+==================================================
+package ru.practicum.ewm.interaction;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.ewm.event.model.Event;
+import ru.practicum.ewm.event.repository.EventRepository;
+import ru.practicum.ewm.exceptions.exceptions.NotFoundException;
+import ru.practicum.ewm.user.model.User;
+import ru.practicum.ewm.user.repository.UserRepository;
+import ru.practicum.interaction.event.EventDetailsDto;
+import ru.practicum.interaction.event.EventStateDto;
+import ru.practicum.interaction.user.UserDetailsDto;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class InternalInteractionService {
+
+    private final UserRepository userRepository;
+    private final EventRepository eventRepository;
+
+    public UserDetailsDto getUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                "User with id="
+                                        + userId
+                                        + " was not found"
+                        )
+                );
+
+        return UserDetailsDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .build();
+    }
+
+    public EventDetailsDto getEvent(Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                "Event with id="
+                                        + eventId
+                                        + " was not found"
+                        )
+                );
+
+        return EventDetailsDto.builder()
+                .id(event.getId())
+                .initiatorId(
+                        event.getInitiator().getId()
+                )
+                .state(
+                        EventStateDto.valueOf(
+                                event.getState().name()
+                        )
+                )
+                .participantLimit(
+                        event.getParticipantLimit()
+                )
+                .requestModeration(
+                        event.getRequestModeration()
+                )
+                .build();
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\interaction\RequestCountProvider.java
+==================================================
+package ru.practicum.ewm.interaction;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import ru.practicum.ewm.event.dto.EventCountsAware;
+import ru.practicum.ewm.interaction.client.RequestServiceClient;
+import ru.practicum.interaction.request.ConfirmedRequestsResponse;
+import ru.practicum.interaction.request.EventIdsRequest;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+@Service
+@RequiredArgsConstructor
+public class RequestCountProvider {
+
+    private final RequestServiceClient requestServiceClient;
+
+    public void enrich(
+            List<? extends EventCountsAware> eventDtos
+    ) {
+        if (eventDtos == null || eventDtos.isEmpty()) {
+            return;
+        }
+
+        List<Long> eventIds = eventDtos.stream()
+                .map(EventCountsAware::getId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        Map<Long, Long> counts = getCounts(eventIds);
+
+        eventDtos.forEach(eventDto ->
+                eventDto.setConfirmedRequests(
+                        counts.getOrDefault(
+                                eventDto.getId(),
+                                0L
+                        )
+                )
+        );
+    }
+
+    public long getConfirmedRequests(Long eventId) {
+        if (eventId == null) {
+            return 0L;
+        }
+
+        return getCounts(List.of(eventId))
+                .getOrDefault(eventId, 0L);
+    }
+
+    private Map<Long, Long> getCounts(
+            Collection<Long> eventIds
+    ) {
+        if (eventIds == null || eventIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        EventIdsRequest request = EventIdsRequest.builder()
+                .eventIds(List.copyOf(eventIds))
+                .build();
+
+        ConfirmedRequestsResponse response =
+                requestServiceClient.getConfirmedRequestCounts(
+                        request
+                );
+
+        if (response == null
+                || response.getConfirmedRequests() == null) {
+
+            return Collections.emptyMap();
+        }
+
+        return response.getConfirmedRequests();
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\interaction\client\CommentServiceClient.java
+==================================================
+package ru.practicum.ewm.interaction.client;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import ru.practicum.interaction.comment.ApprovedCommentsResponse;
+import ru.practicum.interaction.comment.CommentEventIdsRequest;
+
+@FeignClient(
+        name = "comment-service",
+        path = "/internal/comments",
+        fallbackFactory =
+                CommentServiceClientFallbackFactory.class
+)
+public interface CommentServiceClient {
+
+    @PostMapping("/approved-counts")
+    ApprovedCommentsResponse getApprovedCommentCounts(
+            @RequestBody CommentEventIdsRequest request
+    );
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\interaction\client\CommentServiceClientFallbackFactory.java
+==================================================
+package ru.practicum.ewm.interaction.client;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.FallbackFactory;
+import org.springframework.stereotype.Component;
+import ru.practicum.interaction.comment.ApprovedCommentsResponse;
+
+import java.util.Collections;
+
+@Slf4j
+@Component
+public class CommentServiceClientFallbackFactory
+        implements FallbackFactory<CommentServiceClient> {
+
+    @Override
+    public CommentServiceClient create(Throwable cause) {
+        log.warn(
+                "comment-service is unavailable. "
+                        + "Comment counts will be replaced with 0. "
+                        + "Cause: {}",
+                cause.getMessage()
+        );
+
+        return request ->
+                ApprovedCommentsResponse.builder()
+                        .approvedComments(
+                                Collections.emptyMap()
+                        )
+                        .build();
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\interaction\client\RequestServiceClient.java
+==================================================
+package ru.practicum.ewm.interaction.client;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import ru.practicum.interaction.request.ConfirmedRequestsResponse;
+import ru.practicum.interaction.request.EventIdsRequest;
+
+@FeignClient(
+        name = "request-service",
+        path = "/internal/requests",
+        fallbackFactory = RequestServiceClientFallbackFactory.class
+)
+public interface RequestServiceClient {
+
+    @PostMapping("/confirmed-counts")
+    ConfirmedRequestsResponse getConfirmedRequestCounts(
+            @RequestBody EventIdsRequest request
+    );
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\java\ru\practicum\ewm\interaction\client\RequestServiceClientFallbackFactory.java
+==================================================
+package ru.practicum.ewm.interaction.client;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.FallbackFactory;
+import org.springframework.stereotype.Component;
+import ru.practicum.interaction.request.ConfirmedRequestsResponse;
+import ru.practicum.interaction.request.EventIdsRequest;
+
+import java.util.Collections;
+
+@Slf4j
+@Component
+public class RequestServiceClientFallbackFactory
+        implements FallbackFactory<RequestServiceClient> {
+
+    @Override
+    public RequestServiceClient create(Throwable cause) {
+        log.warn(
+                "request-service is unavailable. "
+                        + "Confirmed request counts will be replaced with 0. "
+                        + "Cause: {}",
+                cause.getMessage()
+        );
+
+        return new RequestServiceClient() {
+
+            @Override
+            public ConfirmedRequestsResponse
+            getConfirmedRequestCounts(EventIdsRequest request) {
+
+                return ConfirmedRequestsResponse.builder()
+                        .confirmedRequests(Collections.emptyMap())
+                        .build();
+            }
+        };
+    }
+}
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\core\main-service\src\main\resources\schema.sql
+==================================================
+
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    name VARCHAR(250) NOT NULL,
+    email VARCHAR(254) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS categories (
+    id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS events (
+    id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    annotation VARCHAR(2000) NOT NULL,
+    description VARCHAR(7000) NOT NULL,
+    title VARCHAR(120) NOT NULL,
+    event_date TIMESTAMP NOT NULL,
+    created_on TIMESTAMP NOT NULL,
+    published_on TIMESTAMP,
+    paid BOOLEAN NOT NULL,
+    participant_limit INTEGER NOT NULL DEFAULT 0,
+    request_moderation BOOLEAN NOT NULL DEFAULT true,
+    state VARCHAR(20) NOT NULL, -- PENDING, PUBLISHED, CANCELED
+    initiator_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    category_id BIGINT NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,
+    lat FLOAT,
+    lon FLOAT
+);
+
+CREATE TABLE IF NOT EXISTS compilations (
+    id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    title VARCHAR(50) NOT NULL,
+    pinned BOOLEAN NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS compilation_events (
+    compilation_id BIGINT NOT NULL REFERENCES compilations(id) ON DELETE CASCADE,
+    event_id BIGINT NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    PRIMARY KEY (compilation_id, event_id)
+);
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\infra\config-server\src\main\resources\config\main-service\application.yml
+==================================================
+server:
+  port: ${SERVER_PORT:0}
+  address: 0.0.0.0
+  forward-headers-strategy: framework
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/ewm}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    open-in-view: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        format_sql: true
+
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+
+      client:
+        config:
+          request-service:
+            connectTimeout: 1000
+            readTimeout: 2000
+            loggerLevel: basic
+
+          comment-service:
+            connectTimeout: 1000
+            readTimeout: 2000
+            loggerLevel: basic
+
+  sql:
+    init:
+      mode: always
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        minimum-number-of-calls: 3
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 2
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: ${EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS:3}
+
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+
+  instance:
+    prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:false}
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    lease-renewal-interval-in-seconds: ${EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS:3}
+    lease-expiration-duration-in-seconds: ${EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS:10}
+
+stats-server:
+  service-id: stats-server
+
+app:
+  name: ewm-main-service
+
+logging:
+  level:
+    ru.practicum.ewm: DEBUG
+    ru.practicum.stat: DEBUG
+    org.hibernate.SQL: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+  endpoint:
+    health:
+      show-details: always
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\infra\config-server\src\main\resources\config\gateway-server\application.yml
+==================================================
+server:
+  port: ${SERVER_PORT:8080}
+  address: 0.0.0.0
+
+spring:
+  cloud:
+    gateway:
+      routes:
+
+        - id: comment-service-admin-route
+          uri: lb://comment-service
+          order: -20
+          predicates:
+            - Path=/admin/comments,/admin/comments/**
+
+        - id: comment-service-private-route
+          uri: lb://comment-service
+          order: -20
+          predicates:
+            - Path=/users/*/comments,/users/*/comments/**
+
+        - id: comment-service-event-route
+          uri: lb://comment-service
+          order: -20
+          predicates:
+            - Path=/events/*/comments,/events/*/comments/**
+
+        - id: comment-service-public-route
+          uri: lb://comment-service
+          order: -20
+          predicates:
+            - Path=/comments,/comments/**
+
+        - id: request-service-route
+          order: -10
+          uri: lb://request-service
+          predicates:
+            - Path=/users/*/requests,/users/*/requests/**,/users/*/events/*/requests,/users/*/events/*/requests/**
+
+        - id: main-service-route
+          order: 0
+          uri: lb://main-service
+          predicates:
+            - Path=/events/**,/categories/**,/compilations/**,/users/**,/admin/**,/comments/**
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+
+    registry-fetch-interval-seconds: ${EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS:3}
+
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+
+  instance:
+    instance-id: ${spring.application.name}:${server.port}:${random.value}
+    prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:false}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+  endpoint:
+    health:
+      show-details: always
+
+==================================================
+C:\Users\rvnse\IdeaProjects\java-explore-with-me-plus\docker-compose.yml
+==================================================
+services:
+
+  discovery-server:
+    build:
+      context: ./infra/discovery-server
+    container_name: discovery-server
+    restart: on-failure
+
+    ports:
+      - "8761:8761"
+
+    environment:
+      SERVER_PORT: "8761"
+      SERVER_ADDRESS: "0.0.0.0"
+      SPRING_APPLICATION_NAME: discovery-server
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8761'
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
+
+
+  config-server:
+    build:
+      context: ./infra/config-server
+    container_name: config-server
+    restart: on-failure
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+
+    environment:
+      SERVER_PORT: "8888"
+      SERVER_ADDRESS: "0.0.0.0"
+      SPRING_APPLICATION_NAME: config-server
+      SPRING_PROFILES_ACTIVE: native
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS: "10"
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          bash -ec '
+          exec 3<>/dev/tcp/discovery-server/8761;
+          printf "GET /eureka/apps/CONFIG-SERVER HTTP/1.1\r\nHost: discovery-server\r\nAccept: application/json\r\nConnection: close\r\n\r\n" >&3;
+          grep -q "\"name\":\"CONFIG-SERVER\"" <&3
+          '
+      interval: 3s
+      timeout: 3s
+      retries: 40
+      start_period: 10s
+
+
+  stats-db:
+    image: postgres:16.1
+    container_name: stats-db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: stats
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    volumes:
+      - stats-db-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -q -d "$$POSTGRES_DB" -U "$$POSTGRES_USER"
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+
+  stats-server:
+    build:
+      context: ./stats-service/stats-server
+    container_name: stats-server
+    restart: on-failure
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      stats-db:
+        condition: service_healthy
+
+    ports:
+      - "9090:9090"
+
+    environment:
+      SERVER_PORT: "9090"
+      SERVER_ADDRESS: "0.0.0.0"
+      SPRING_APPLICATION_NAME: stats-server
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS: "10"
+
+      SPRING_CLOUD_CONFIG_FAIL_FAST: "true"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "30"
+      SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: "1000"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_INTERVAL: "3000"
+      SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER: "1.2"
+
+      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/stats
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          bash -ec 'exec 3<>/dev/tcp/127.0.0.1/9090;
+          printf "GET /actuator/health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3;
+          grep -q "\"status\":\"UP\"" <&3'
+      interval: 3s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+
+
+  ewm-db:
+    image: postgres:16.1
+    container_name: ewm-db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ewm
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    volumes:
+      - ewm-db-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -q -d "$$POSTGRES_DB" -U "$$POSTGRES_USER"
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  request-db:
+    image: postgres:16.1
+    container_name: request-db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: requests
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    volumes:
+      - request-db-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -q -d "$$POSTGRES_DB" -U "$$POSTGRES_USER"
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+
+  main-service:
+    build:
+      context: ./core/main-service
+    container_name: main-service
+    restart: on-failure
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      stats-server:
+        condition: service_healthy
+      ewm-db:
+        condition: service_healthy
+
+    environment:
+      SERVER_PORT: "8081"
+      SERVER_ADDRESS: "0.0.0.0"
+      SPRING_APPLICATION_NAME: main-service
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS: "10"
+
+      SPRING_CLOUD_CONFIG_FAIL_FAST: "true"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "30"
+      SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: "1000"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_INTERVAL: "3000"
+      SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER: "1.2"
+
+      SPRING_DATASOURCE_URL: jdbc:postgresql://ewm-db:5432/ewm
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8081;
+          printf "GET /actuator/health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3;
+          grep -q "\"status\":\"UP\"" <&3'
+      interval: 3s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+
+  request-service:
+    build:
+      context: ./core/request-service
+    container_name: request-service
+    restart: on-failure
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      request-db:
+        condition: service_healthy
+
+    ports:
+      - "8082:8082"
+
+    environment:
+      SERVER_PORT: "8082"
+      SERVER_ADDRESS: "0.0.0.0"
+      SPRING_APPLICATION_NAME: request-service
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS: "10"
+
+      SPRING_CLOUD_CONFIG_FAIL_FAST: "true"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "30"
+      SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: "1000"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_INTERVAL: "3000"
+      SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER: "1.2"
+
+      SPRING_DATASOURCE_URL: jdbc:postgresql://request-db:5432/requests
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8082;
+          printf "GET /actuator/health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3;
+          grep -q "\"status\":\"UP\"" <&3'
+      interval: 3s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+
+  comment-service:
+    build:
+      context: ./core/comment-service
+    container_name: comment-service
+    restart: on-failure
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      comment-db:
+        condition: service_healthy
+
+    ports:
+      - "8083:8083"
+
+    environment:
+      SERVER_PORT: "8083"
+      SERVER_ADDRESS: "0.0.0.0"
+      SPRING_APPLICATION_NAME: comment-service
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS: "10"
+
+      SPRING_CLOUD_CONFIG_FAIL_FAST: "true"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "30"
+      SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: "1000"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_INTERVAL: "3000"
+      SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER: "1.2"
+
+      SPRING_DATASOURCE_URL: jdbc:postgresql://comment-db:5432/comments
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8083;
+          printf "GET /actuator/health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3;
+          grep -q "\"status\":\"UP\"" <&3'
+      interval: 3s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+
+  comment-db:
+    image: postgres:16.1
+    container_name: comment-db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: comments
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    volumes:
+      - comment-db-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -q -d "$$POSTGRES_DB" -U "$$POSTGRES_USER"
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  gateway-server:
+    build:
+      context: ./infra/gateway-server
+    container_name: gateway-server
+    restart: on-failure
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      main-service:
+        condition: service_healthy
+      request-service:
+        condition: service_healthy
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      SERVER_PORT: "8080"
+      SERVER_ADDRESS: "0.0.0.0"
+      SPRING_APPLICATION_NAME: gateway-server
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
+
+      SPRING_CLOUD_CONFIG_FAIL_FAST: "true"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "30"
+      SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: "1000"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_INTERVAL: "3000"
+      SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER: "1.2"
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8080;
+          printf "GET /actuator/health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3;
+          grep -q "\"status\":\"UP\"" <&3'
+      interval: 3s
+      timeout: 3s
+      retries: 40
+      start_period: 15s
+
+
+volumes:
+  stats-db-data:
+  ewm-db-data:
+  request-db-data:
+  comment-db-data:
+
+================ EXTERNAL REFERENCES ================
+
+core\main-service\src\main\java\ru\practicum\ewm\interaction\CommentCountProvider.java:5:import ru.practicum.ewm.event.dto.EventCountsAware;
+core\main-service\src\main\java\ru\practicum\ewm\interaction\InternalInteractionService.java:6:import ru.practicum.ewm.event.model.Event;
+core\main-service\src\main\java\ru\practicum\ewm\interaction\InternalInteractionService.java:7:import ru.practicum.ewm.event.repository.EventRepository;
+core\main-service\src\main\java\ru\practicum\ewm\interaction\InternalInteractionService.java:21:    private final EventRepository eventRepository;
+core\main-service\src\main\java\ru\practicum\ewm\interaction\InternalInteractionService.java:41:        Event event = eventRepository.findById(eventId)
+core\main-service\src\main\java\ru\practicum\ewm\interaction\RequestCountProvider.java:5:import ru.practicum.ewm.event.dto.EventCountsAware;
+
+
+
