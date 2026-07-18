@@ -436,34 +436,8 @@ services:
   gateway-server:
     build:
       context: ./infra/gateway-server
-
     container_name: gateway-server
     restart: on-failure
-
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-
-      config-server:
-        condition: service_healthy
-
-      stats-server:
-        condition: service_healthy
-
-      request-service:
-        condition: service_healthy
-
-      comment-service:
-        condition: service_healthy
-
-      event-service:
-        condition: service_healthy
-
-      user-service:
-        condition: service_healthy
-
-    ports:
-      - "8080:8080"
 
     environment:
       SPRING_APPLICATION_NAME: gateway-server
@@ -482,8 +456,9 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://discovery-server:8761/eureka/"
       EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
-      EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS: "3"
-      EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS: "10"
+
+      GATEWAY_WAIT_FOR_REQUIRED_SERVICES: "true"
+      GATEWAY_REQUIRED_SERVICES_TIMEOUT_SECONDS: "45"
 
     healthcheck:
       test:
