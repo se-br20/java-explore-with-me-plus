@@ -29,7 +29,7 @@ class StatsControllerTest {
     @Test
     void shouldCreateHit() throws Exception {
         EndpointHitDto hit = EndpointHitDto.builder()
-                .app("ewm-service")
+                .app("ewm-event-service")
                 .uri("/events/1")
                 .ip("127.0.0.1")
                 .timestamp(LocalDateTime.now())
