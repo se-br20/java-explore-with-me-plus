@@ -6,10 +6,29 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: main-service-route
-          uri: lb://main-service
+        - id: comment-service-route
+          uri: lb://comment-service
+          order: -40
           predicates:
-            - Path=/events/**,/categories/**,/compilations/**,/users/**,/admin/**,/comments/**
+            - Path=/admin/comments,/admin/comments/**,/users/*/comments,/users/*/comments/**,/events/*/comments,/events/*/comments/**,/comments/**
+
+        - id: request-service-route
+          uri: lb://request-service
+          order: -30
+          predicates:
+            - Path=/users/*/requests,/users/*/requests/**,/users/*/events/*/requests,/users/*/events/*/requests/**
+
+        - id: event-service-route
+          uri: lb://event-service
+          order: -20
+          predicates:
+            - Path=/events,/events/**,/categories,/categories/**,/compilations,/compilations/**,/admin/events,/admin/events/**,/admin/categories,/admin/categories/**,/admin/compilations,/admin/compilations/**,/users/*/events,/users/*/events/**
+
+        - id: user-service-route
+          uri: lb://user-service
+          order: -10
+          predicates:
+            - Path=/admin/users,/admin/users/**
 
 eureka:
   client:
