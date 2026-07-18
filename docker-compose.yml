@@ -436,8 +436,12 @@ services:
   gateway-server:
     build:
       context: ./infra/gateway-server
+
     container_name: gateway-server
     restart: on-failure
+
+    ports:
+      - "8080:8080"
 
     environment:
       SPRING_APPLICATION_NAME: gateway-server
