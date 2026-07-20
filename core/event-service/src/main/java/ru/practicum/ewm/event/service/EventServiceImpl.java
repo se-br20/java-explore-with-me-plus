@@ -23,6 +23,7 @@ import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.exceptions.exceptions.ConditionsNotMetException;
 import ru.practicum.ewm.exceptions.exceptions.NotFoundException;
+import ru.practicum.ewm.exceptions.exceptions.BadRequestException;
 import ru.practicum.ewm.interaction.CommentCountProvider;
 import ru.practicum.ewm.interaction.RequestCountProvider;
 import ru.practicum.ewm.interaction.client.UserServiceClient;
@@ -273,7 +274,7 @@ public class EventServiceImpl implements EventService {
                 );
 
         if (!hasConfirmedRequest) {
-            throw new ConditionsNotMetException(
+            throw new BadRequestException(
                     "Only users with a confirmed "
                             + "participation request can like "
                             + "event with id="

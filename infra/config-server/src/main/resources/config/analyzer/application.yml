@@ -68,4 +68,4 @@ management:
       show-details: always
 
 recommendations:
-  recent-actions-limit: ${RECOMMENDATIONS_RECENT_ACTIONS_LIMIT:5}
+  nearest-neighbors-limit: ${RECOMMENDATIONS_NEAREST_NEIGHBORS_LIMIT:5}

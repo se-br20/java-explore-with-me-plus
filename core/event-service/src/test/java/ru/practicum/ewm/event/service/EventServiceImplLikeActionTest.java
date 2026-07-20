@@ -9,7 +9,7 @@ import ru.practicum.ewm.categories.repository.CategoryRepository;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.repository.EventRepository;
-import ru.practicum.ewm.exceptions.exceptions.ConditionsNotMetException;
+import ru.practicum.ewm.exceptions.exceptions.BadRequestException;
 import ru.practicum.ewm.interaction.CommentCountProvider;
 import ru.practicum.ewm.interaction.RequestCountProvider;
 import ru.practicum.ewm.interaction.client.UserServiceClient;
@@ -110,7 +110,7 @@ class EventServiceImplLikeActionTest {
         ).thenReturn(false);
 
         assertThrows(
-                ConditionsNotMetException.class,
+                BadRequestException.class,
                 () -> eventService.likeEvent(
                         userId,
                         eventId

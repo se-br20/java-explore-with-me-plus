@@ -98,12 +98,9 @@ public class PublicEventController {
     @GetMapping("/{id}")
     public EventFullDto getEvent(
             @PathVariable long id,
-            @RequestHeader(
-                    value = X_EWM_USER_ID,
-                    required = false
-            )
+            @RequestHeader(X_EWM_USER_ID)
             @Positive(message = "User id must be positive")
-            Long userId,
+            long userId,
             HttpServletRequest request
     ) {
         String clientIp =

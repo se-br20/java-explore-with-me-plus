@@ -11,9 +11,11 @@ import ru.practicum.ewm.stats.analyzer.repository.EventSimilarityRepository;
 import ru.practicum.ewm.stats.analyzer.repository.UserActionRepository;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -21,7 +23,10 @@ import static org.mockito.Mockito.when;
 class RecommendationServiceTest {
 
     private UserActionRepository userActionRepository;
-    private EventSimilarityRepository similarityRepository;
+
+    private EventSimilarityRepository
+            similarityRepository;
+
     private RecommendationService service;
 
     @BeforeEach
@@ -35,26 +40,33 @@ class RecommendationServiceTest {
         service = new RecommendationService(
                 userActionRepository,
                 similarityRepository,
-                5
+                2
         );
     }
 
     @Test
-    void shouldCalculateWeightedRecommendations() {
-        List<UserActionEntity> actions = List.of(
-                action(
-                        1L,
-                        1L,
-                        1.0,
-                        "2026-07-20T12:00:00Z"
-                ),
-                action(
-                        1L,
-                        2L,
-                        0.8,
-                        "2026-07-20T11:00:00Z"
-                )
-        );
+    void shouldSelectCandidatesBeforePredictionAndUseOnlyNearestNeighbors() {
+        List<UserActionEntity> actions =
+                List.of(
+                        action(
+                                1L,
+                                1L,
+                                1.0,
+                                "2026-07-20T12:00:00Z"
+                        ),
+                        action(
+                                1L,
+                                2L,
+                                0.4,
+                                "2026-07-20T11:00:00Z"
+                        ),
+                        action(
+                                1L,
+                                3L,
+                                0.8,
+                                "2026-07-20T10:00:00Z"
+                        )
+                );
 
         when(
                 userActionRepository
@@ -67,39 +79,87 @@ class RecommendationServiceTest {
                 similarityRepository
                         .findAllConnectedToAnyEvent(
                                 argThat(eventIds ->
-                                        eventIds != null
-                                                && eventIds.size() == 2
-                                                && eventIds.contains(1L)
-                                                && eventIds.contains(2L)
+                                        containsExactly(
+                                                eventIds,
+                                                1L,
+                                                2L
+                                        )
                                 )
                         )
         ).thenReturn(
                 List.of(
+                        similarity(1L, 10L, 0.90),
+                        similarity(2L, 10L, 0.80),
 
-                        similarity(
-                                1L,
-                                10L,
-                                0.5
-                        ),
-                        similarity(
-                                2L,
-                                10L,
-                                0.25
-                        ),
+                        similarity(1L, 11L, 0.85),
+                        similarity(2L, 11L, 0.84),
 
-                        similarity(
-                                1L,
-                                11L,
-                                0.9
-                        ),
-
-                        similarity(
-                                1L,
-                                2L,
-                                0.99
-                        )
+                        similarity(1L, 12L, 0.20)
                 )
         );
+
+        when(
+                similarityRepository
+                        .findAllConnectedToAnyEvent(
+                                argThat(eventIds ->
+                                        containsExactly(
+                                                eventIds,
+                                                10L,
+                                                11L
+                                        )
+                                )
+                        )
+        ).thenReturn(
+                List.of(
+                        similarity(1L, 10L, 0.90),
+                        similarity(2L, 10L, 0.80),
+                        similarity(3L, 10L, 0.10),
+
+                        similarity(1L, 11L, 0.85),
+                        similarity(2L, 11L, 0.84),
+                        similarity(3L, 11L, 0.83)
+                )
+        );
+
+        List<Recommendation> result =
+                service.getRecommendationsForUser(
+                        1L,
+                        2
+                );
+
+        assertEquals(2, result.size());
+
+        assertEquals(
+                10L,
+                result.get(0).eventId()
+        );
+
+        assertEquals(
+                0.7176470588,
+                result.get(0).score(),
+                0.000001
+        );
+
+        assertEquals(
+                11L,
+                result.get(1).eventId()
+        );
+
+        assertEquals(
+                0.7017751479,
+                result.get(1).score(),
+                0.000001
+        );
+    }
+
+    @Test
+    void shouldReturnEmptyRecommendationsWithoutUserActions() {
+        when(
+                userActionRepository
+                        .findAllByUserIdOrderByInteractionTimeDesc(
+                                1L
+                        )
+        ).thenReturn(List.of());
 
         List<Recommendation> result =
                 service.getRecommendationsForUser(
@@ -107,29 +167,7 @@ class RecommendationServiceTest {
                         10
                 );
 
-        assertEquals(2, result.size());
-
-        assertEquals(
-                11L,
-                result.get(0).eventId()
-        );
-
-        assertEquals(
-                1.0,
-                result.get(0).score(),
-                0.000001
-        );
-
-        assertEquals(
-                10L,
-                result.get(1).eventId()
-        );
-
-        assertEquals(
-                0.933333,
-                result.get(1).score(),
-                0.000001
-        );
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -198,14 +236,16 @@ class RecommendationServiceTest {
 
     @Test
     void shouldReturnInteractionScoresForAllRequestedEvents() {
-        UserActionRepository.EventInteractionScoreProjection
+        UserActionRepository
+                .EventInteractionScoreProjection
                 eventOneProjection =
                 projection(
                         1L,
                         1.8
                 );
 
-        UserActionRepository.EventInteractionScoreProjection
+        UserActionRepository
+                .EventInteractionScoreProjection
                 eventTwoProjection =
                 projection(
                         2L,
@@ -216,11 +256,12 @@ class RecommendationServiceTest {
                 userActionRepository
                         .sumRatingsByEventIds(
                                 argThat(eventIds ->
-                                        eventIds != null
-                                                && eventIds.size() == 3
-                                                && eventIds.contains(1L)
-                                                && eventIds.contains(2L)
-                                                && eventIds.contains(3L)
+                                        containsExactly(
+                                                eventIds,
+                                                1L,
+                                                2L,
+                                                3L
+                                        )
                                 )
                         )
         ).thenReturn(
@@ -276,6 +317,17 @@ class RecommendationServiceTest {
         );
     }
 
+    private boolean containsExactly(
+            Collection<Long> actual,
+            Long... expected
+    ) {
+        return actual != null
+                && actual.size() == expected.length
+                && actual.containsAll(
+                List.of(expected)
+        );
+    }
+
     private UserActionEntity action(
             Long userId,
             Long eventId,
@@ -317,12 +369,14 @@ class RecommendationServiceTest {
                 .build();
     }
 
-    private UserActionRepository.EventInteractionScoreProjection
+    private UserActionRepository
+            .EventInteractionScoreProjection
     projection(
             Long eventId,
             Double score
     ) {
-        UserActionRepository.EventInteractionScoreProjection
+        UserActionRepository
+                .EventInteractionScoreProjection
                 projection =
                 mock(
                         UserActionRepository
