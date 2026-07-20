@@ -1,6 +1,6 @@
 package ru.practicum.ewm.request.dto;
 
-import org.springframework.stereotype.Component;
+import lombok.experimental.UtilityClass;
 import ru.practicum.ewm.request.model.ParticipationRequest;
 import ru.practicum.ewm.request.model.RequestStatus;
 
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-@Component
+@UtilityClass
 public class ParticipationRequestMapper {
 
     private static final DateTimeFormatter FORMATTER =
@@ -46,7 +46,10 @@ public class ParticipationRequestMapper {
             List<ParticipationRequest> requests
     ) {
         return requests.stream()
-                .map(this::toParticipationRequestDto)
+                .map(
+                        ParticipationRequestMapper
+                                ::toParticipationRequestDto
+                )
                 .toList();
     }
 

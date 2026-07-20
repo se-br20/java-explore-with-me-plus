@@ -36,7 +36,6 @@ public class ParticipationRequestServiceImpl
         implements ParticipationRequestService {
 
     private final ParticipationRequestRepository requestRepository;
-    private final ParticipationRequestMapper requestMapper;
     private final UserServiceClient userServiceClient;
     private final EventServiceClient eventServiceClient;
 
@@ -96,7 +95,7 @@ public class ParticipationRequestServiceImpl
         }
 
         ParticipationRequest request =
-                requestMapper.toParticipationRequest(
+                ParticipationRequestMapper.toParticipationRequest(
                         eventId,
                         userId
                 );
@@ -112,7 +111,7 @@ public class ParticipationRequestServiceImpl
 
         request = requestRepository.save(request);
 
-        return requestMapper.toParticipationRequestDto(
+        return ParticipationRequestMapper.toParticipationRequestDto(
                 request
         );
     }
@@ -125,7 +124,7 @@ public class ParticipationRequestServiceImpl
         List<ParticipationRequest> requests =
                 requestRepository.findByRequesterId(userId);
 
-        return requestMapper.toParticipationRequestDto(
+        return ParticipationRequestMapper.toParticipationRequestDto(
                 requests
         );
     }
@@ -170,7 +169,7 @@ public class ParticipationRequestServiceImpl
 
         request.setStatus(RequestStatus.CANCELED);
 
-        return requestMapper.toParticipationRequestDto(
+        return ParticipationRequestMapper.toParticipationRequestDto(
                 requestRepository.save(request)
         );
     }
@@ -192,9 +191,8 @@ public class ParticipationRequestServiceImpl
         List<ParticipationRequest> requests =
                 requestRepository.findByEventId(eventId);
 
-        return requestMapper.toParticipationRequestDto(
-                requests
-        );
+        return ParticipationRequestMapper
+                .toParticipationRequestDto(requests);
     }
 
     @Override
@@ -274,7 +272,7 @@ public class ParticipationRequestServiceImpl
                     RequestStatus.REJECTED
             );
 
-            return requestMapper
+            return ParticipationRequestMapper
                     .toEventRequestStatusUpdateResult(
                             confirmed,
                             rejected
@@ -299,7 +297,7 @@ public class ParticipationRequestServiceImpl
                     RequestStatus.CONFIRMED
             );
 
-            return requestMapper
+            return ParticipationRequestMapper
                     .toEventRequestStatusUpdateResult(
                             confirmed,
                             rejected
@@ -345,7 +343,7 @@ public class ParticipationRequestServiceImpl
             );
         }
 
-        return requestMapper
+        return ParticipationRequestMapper
                 .toEventRequestStatusUpdateResult(
                         confirmed,
                         rejected
