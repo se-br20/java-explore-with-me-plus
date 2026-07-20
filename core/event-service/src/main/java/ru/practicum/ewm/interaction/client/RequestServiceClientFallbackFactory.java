@@ -17,8 +17,9 @@ public class RequestServiceClientFallbackFactory
     public RequestServiceClient create(Throwable cause) {
         log.warn(
                 "request-service is unavailable. "
-                        + "Confirmed request counts will be replaced with 0. "
-                        + "Cause: {}",
+                        + "Confirmed request counts will be "
+                        + "replaced with 0 and LIKE permission "
+                        + "will be denied. Cause: {}",
                 cause.getMessage()
         );
 
@@ -26,11 +27,22 @@ public class RequestServiceClientFallbackFactory
 
             @Override
             public ConfirmedRequestsResponse
-            getConfirmedRequestCounts(EventIdsRequest request) {
-
+            getConfirmedRequestCounts(
+                    EventIdsRequest request
+            ) {
                 return ConfirmedRequestsResponse.builder()
-                        .confirmedRequests(Collections.emptyMap())
+                        .confirmedRequests(
+                                Collections.emptyMap()
+                        )
                         .build();
+            }
+
+            @Override
+            public boolean hasConfirmedRequest(
+                    Long userId,
+                    Long eventId
+            ) {
+                return false;
             }
         };
     }

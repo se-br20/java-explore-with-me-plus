@@ -54,7 +54,7 @@ public class EventRepositoryCustomImpl
                                 event.paid,
                                 event.publishedOn,
                                 event.title,
-                                Expressions.asNumber(0L),
+                                Expressions.asNumber(0.0),
                                 Expressions.asNumber(0L)
                         )
                 )
@@ -93,7 +93,7 @@ public class EventRepositoryCustomImpl
                                 event.paid,
                                 event.publishedOn,
                                 event.title,
-                                Expressions.asNumber(0L),
+                                Expressions.asNumber(0.0),
                                 Expressions.asNumber(0L)
                         )
                 )
@@ -134,7 +134,7 @@ public class EventRepositoryCustomImpl
                                 event.requestModeration,
                                 event.state,
                                 event.title,
-                                Expressions.asNumber(0L),
+                                Expressions.asNumber(0.0),
                                 Expressions.asNumber(0L)
                         )
                 )
@@ -178,7 +178,7 @@ public class EventRepositoryCustomImpl
                                 event.requestModeration,
                                 event.state,
                                 event.title,
-                                Expressions.asNumber(0L),
+                                Expressions.asNumber(0.0),
                                 Expressions.asNumber(0L)
                         )
                 )

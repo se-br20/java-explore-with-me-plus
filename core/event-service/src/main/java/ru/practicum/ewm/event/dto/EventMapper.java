@@ -146,7 +146,7 @@ public final class EventMapper {
     public static EventFullDto toEventFullDto(
             Event event,
             Long confirmedRequests,
-            Long views
+            Double rating
     ) {
         return EventFullDto.builder()
                 .id(event.getId())
@@ -172,7 +172,7 @@ public final class EventMapper {
                 )
                 .state(event.getState())
                 .title(event.getTitle())
-                .views(views)
+                .rating(rating)
                 .commentsCount(0L)
                 .build();
     }
@@ -180,7 +180,7 @@ public final class EventMapper {
     public static EventShortDto toEventShortDto(
             Event event,
             Long confirmedRequests,
-            Long views
+            Double rating
     ) {
         return EventShortDto.builder()
                 .id(event.getId())
@@ -192,11 +192,16 @@ public final class EventMapper {
                 )
                 .confirmedRequests(confirmedRequests)
                 .eventDate(event.getEventDate())
-                .initiator(toInitiatorDto(event))
+                .initiator(
+                        UserShortDto.builder()
+                                .id(event.getInitiatorId())
+                                .name(event.getInitiatorName())
+                                .build()
+                )
                 .paid(event.getPaid())
                 .publishedOn(event.getPublishedOn())
                 .title(event.getTitle())
-                .views(views)
+                .rating(rating)
                 .commentsCount(0L)
                 .build();
     }

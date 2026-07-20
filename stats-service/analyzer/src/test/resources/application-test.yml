@@ -1,0 +1,49 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+
+    discovery:
+      enabled: false
+
+  datasource:
+    url: jdbc:h2:mem:analyzer-test
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+    open-in-view: false
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+grpc:
+  server:
+    port: 0
+
+kafka:
+  topics:
+    user-actions: stats.user-actions.v1
+    events-similarity: stats.events-similarity.v1
+
+  groups:
+    user-actions: analyzer-user-actions-test
+    events-similarity: analyzer-events-similarity-test
+
+recommendations:
+  recent-actions-limit: 5
