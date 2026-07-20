@@ -9,7 +9,7 @@ import ru.practicum.ewm.categories.repository.CategoryRepository;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.repository.EventRepository;
-import ru.practicum.ewm.exceptions.exceptions.ConditionsNotMetException;
+import ru.practicum.ewm.exceptions.exceptions.BadRequestException;
 import ru.practicum.ewm.exceptions.exceptions.NotFoundException;
 import ru.practicum.ewm.interaction.CommentCountProvider;
 import ru.practicum.ewm.interaction.RequestCountProvider;
@@ -21,9 +21,7 @@ import ru.practicum.stat.client.UserActionType;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceImplLikeActionTest {
@@ -102,29 +100,23 @@ class EventServiceImplLikeActionTest {
         long userId = 3L;
         long eventId = 2L;
 
-        Event event =
-                Event.builder()
-                        .id(eventId)
-                        .state(
-                                EventState.PUBLISHED
-                        )
-                        .build();
+        Event event = Event.builder()
+                .id(eventId)
+                .state(EventState.PUBLISHED)
+                .build();
 
         when(eventRepository.findById(eventId))
-                .thenReturn(
-                        Optional.of(event)
-                );
+                .thenReturn(Optional.of(event));
 
         when(
-                requestCountProvider
-                        .hasConfirmedRequest(
-                                userId,
-                                eventId
-                        )
+                requestCountProvider.hasConfirmedRequest(
+                        userId,
+                        eventId
+                )
         ).thenReturn(false);
 
         assertThrows(
-                ConditionsNotMetException.class,
+                BadRequestException.class,
                 () -> eventService.likeEvent(
                         userId,
                         eventId

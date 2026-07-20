@@ -14,6 +14,7 @@ import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventSort;
 import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.repository.EventRepository;
+import ru.practicum.ewm.exceptions.exceptions.BadRequestException;
 import ru.practicum.ewm.exceptions.exceptions.ConditionsNotMetException;
 import ru.practicum.ewm.exceptions.exceptions.NotFoundException;
 import ru.practicum.ewm.interaction.CommentCountProvider;
@@ -294,8 +295,7 @@ public class EventServiceImpl implements EventService {
                 );
 
         if (!hasConfirmedRequest) {
-
-            throw new ConditionsNotMetException(
+            throw new BadRequestException(
                     "Only users with a confirmed "
                             + "participation request can like "
                             + "event with id="
@@ -619,8 +619,8 @@ public class EventServiceImpl implements EventService {
     public EventFullDto findEventById(
             String uri,
             String ip,
-            Long id,
-            Long userId
+            long id,
+            long userId
     ) {
         EventFullDto event =
                 eventRepository.findEventByIdFullDto(id)
@@ -632,9 +632,7 @@ public class EventServiceImpl implements EventService {
                                 )
                         );
 
-        if (event.getState()
-                != EventState.PUBLISHED) {
-
+        if (event.getState() != EventState.PUBLISHED) {
             throw new NotFoundException(
                     "Published event with id="
                             + id
@@ -643,15 +641,15 @@ public class EventServiceImpl implements EventService {
         }
 
         enrichEventWithRating(event);
-        enrichEventsListWithCounts(List.of(event));
+        enrichEventsListWithCounts(
+                List.of(event)
+        );
 
-        if (userId != null) {
-            collectorClient.sendAction(
-                    userId,
-                    id,
-                    UserActionType.VIEW
-            );
-        }
+        collectorClient.sendAction(
+                userId,
+                id,
+                UserActionType.VIEW
+        );
 
         return event;
     }

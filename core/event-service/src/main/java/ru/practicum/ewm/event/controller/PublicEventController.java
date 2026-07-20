@@ -45,10 +45,7 @@ public class PublicEventController {
         String clientIp =
                 extractClientIp(request);
 
-        param.setUri(
-                request.getRequestURI()
-        );
-
+        param.setUri(request.getRequestURI());
         param.setIp(clientIp);
 
         log.debug(
@@ -66,10 +63,7 @@ public class PublicEventController {
     @GetMapping("/recommendations")
     public List<EventShortDto> getRecommendations(
             @RequestHeader(X_EWM_USER_ID)
-            @Positive(
-                    message =
-                            "User id must be positive"
-            )
+            @Positive(message = "User id must be positive")
             Long userId
     ) {
         log.debug(
@@ -78,8 +72,7 @@ public class PublicEventController {
                 userId
         );
 
-        return eventService
-                .getRecommendations(userId);
+        return eventService.getRecommendations(userId);
     }
 
     @PutMapping("/{eventId}/like")
@@ -87,10 +80,7 @@ public class PublicEventController {
             @PathVariable Long eventId,
 
             @RequestHeader(X_EWM_USER_ID)
-            @Positive(
-                    message =
-                            "User id must be positive"
-            )
+            @Positive(message = "User id must be positive")
             Long userId
     ) {
         log.debug(
@@ -109,17 +99,9 @@ public class PublicEventController {
     @GetMapping("/{id}")
     public EventFullDto getEvent(
             @PathVariable long id,
-
-            @RequestHeader(
-                    value = X_EWM_USER_ID,
-                    required = false
-            )
-            @Positive(
-                    message =
-                            "User id must be positive"
-            )
-            Long userId,
-
+            @RequestHeader(X_EWM_USER_ID)
+            @Positive(message = "User id must be positive")
+            long userId,
             HttpServletRequest request
     ) {
         String clientIp =
@@ -147,9 +129,7 @@ public class PublicEventController {
             HttpServletRequest request
     ) {
         String forwardedFor =
-                request.getHeader(
-                        X_FORWARDED_FOR
-                );
+                request.getHeader(X_FORWARDED_FOR);
 
         if (forwardedFor != null
                 && !forwardedFor.isBlank()) {
@@ -160,9 +140,7 @@ public class PublicEventController {
         }
 
         String realIp =
-                request.getHeader(
-                        X_REAL_IP
-                );
+                request.getHeader(X_REAL_IP);
 
         if (realIp != null
                 && !realIp.isBlank()) {

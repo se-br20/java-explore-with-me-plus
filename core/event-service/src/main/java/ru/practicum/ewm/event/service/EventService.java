@@ -60,8 +60,8 @@ public interface EventService {
     EventFullDto findEventById(
             String uri,
             String ip,
-            Long id,
-            Long userId
+            long id,
+            long userId
     );
 
     List<EventShortDto> getShortDtosByIds(

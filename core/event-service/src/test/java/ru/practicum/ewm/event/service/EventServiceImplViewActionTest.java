@@ -15,17 +15,14 @@ import ru.practicum.stat.client.CollectorClient;
 import ru.practicum.stat.client.RecommendedEvent;
 import ru.practicum.stat.client.UserActionType;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyCollection;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -40,7 +37,8 @@ class EventServiceImplViewActionTest {
 
     @BeforeEach
     void setUp() {
-        eventRepository = mock(EventRepository.class);
+        eventRepository =
+                mock(EventRepository.class);
 
         UserServiceClient userServiceClient =
                 mock(UserServiceClient.class);
@@ -73,15 +71,16 @@ class EventServiceImplViewActionTest {
                 )
         );
 
-        eventService = new EventServiceImpl(
-                eventRepository,
-                userServiceClient,
-                categoryRepository,
-                collectorClient,
-                analyzerClient,
-                commentCountProvider,
-                requestCountProvider
-        );
+        eventService =
+                new EventServiceImpl(
+                        eventRepository,
+                        userServiceClient,
+                        categoryRepository,
+                        collectorClient,
+                        analyzerClient,
+                        commentCountProvider,
+                        requestCountProvider
+                );
     }
 
     @Test
@@ -127,39 +126,30 @@ class EventServiceImplViewActionTest {
     }
 
     @Test
-    void shouldNotSendViewForAnonymousRequest() {
-        EventFullDto event =
-                publishedEvent(10L);
-
+    void shouldReturnEmptyRecommendationsWhenAnalyzerHasNoData() {
         when(
-                eventRepository.findEventByIdFullDto(
-                        10L
+                analyzerClient.getRecommendationsForUser(
+                        5L,
+                        10
                 )
-        ).thenReturn(
-                Optional.of(event)
-        );
+        ).thenReturn(List.of());
 
-        EventFullDto result =
-                eventService.findEventById(
-                        "/events/10",
-                        "127.0.0.1",
-                        10L,
-                        null
+        List<EventShortDto> result =
+                eventService.getRecommendations(
+                        5L
                 );
 
-        assertSame(event, result);
+        assertTrue(result.isEmpty());
 
-        assertEquals(
-                0.4,
-                result.getRating(),
-                0.000001
-        );
+        verify(analyzerClient)
+                .getRecommendationsForUser(
+                        5L,
+                        10
+                );
 
-        verify(collectorClient, never())
-                .sendAction(
-                        anyLong(),
-                        anyLong(),
-                        any(UserActionType.class)
+        verify(eventRepository, never())
+                .findAllByIdIn(
+                        anyCollection()
                 );
     }
 
@@ -179,33 +169,5 @@ class EventServiceImplViewActionTest {
                         )
                 )
                 .build();
-    }
-
-    @Test
-    void shouldReturnEmptyRecommendationsWhenAnalyzerHasNoData() {
-        when(
-                analyzerClient.getRecommendationsForUser(
-                        5L,
-                        10
-                )
-        ).thenReturn(
-                List.of()
-        );
-
-        List<EventShortDto> result =
-                eventService.getRecommendations(5L);
-
-        assertTrue(result.isEmpty());
-
-        verify(analyzerClient)
-                .getRecommendationsForUser(
-                        5L,
-                        10
-                );
-
-        verify(eventRepository, never())
-                .findAllByIdIn(
-                        anyCollection()
-                );
     }
 }
