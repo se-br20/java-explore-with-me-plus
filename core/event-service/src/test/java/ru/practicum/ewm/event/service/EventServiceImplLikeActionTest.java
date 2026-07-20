@@ -9,7 +9,8 @@ import ru.practicum.ewm.categories.repository.CategoryRepository;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.repository.EventRepository;
-import ru.practicum.ewm.exceptions.exceptions.BadRequestException;
+import ru.practicum.ewm.exceptions.exceptions.ConditionsNotMetException;
+import ru.practicum.ewm.exceptions.exceptions.NotFoundException;
 import ru.practicum.ewm.interaction.CommentCountProvider;
 import ru.practicum.ewm.interaction.RequestCountProvider;
 import ru.practicum.ewm.interaction.client.UserServiceClient;
@@ -56,19 +57,25 @@ class EventServiceImplLikeActionTest {
         long userId = 1L;
         long eventId = 2L;
 
-        Event event = Event.builder()
-                .id(eventId)
-                .state(EventState.PUBLISHED)
-                .build();
+        Event event =
+                Event.builder()
+                        .id(eventId)
+                        .state(
+                                EventState.PUBLISHED
+                        )
+                        .build();
 
         when(eventRepository.findById(eventId))
-                .thenReturn(Optional.of(event));
+                .thenReturn(
+                        Optional.of(event)
+                );
 
         when(
-                requestCountProvider.hasConfirmedRequest(
-                        userId,
-                        eventId
-                )
+                requestCountProvider
+                        .hasConfirmedRequest(
+                                userId,
+                                eventId
+                        )
         ).thenReturn(true);
 
         eventService.likeEvent(
@@ -82,11 +89,12 @@ class EventServiceImplLikeActionTest {
                         eventId
                 );
 
-        verify(collectorClient).sendAction(
-                userId,
-                eventId,
-                UserActionType.LIKE
-        );
+        verify(collectorClient)
+                .sendAction(
+                        userId,
+                        eventId,
+                        UserActionType.LIKE
+                );
     }
 
     @Test
@@ -94,23 +102,29 @@ class EventServiceImplLikeActionTest {
         long userId = 3L;
         long eventId = 2L;
 
-        Event event = Event.builder()
-                .id(eventId)
-                .state(EventState.PUBLISHED)
-                .build();
+        Event event =
+                Event.builder()
+                        .id(eventId)
+                        .state(
+                                EventState.PUBLISHED
+                        )
+                        .build();
 
         when(eventRepository.findById(eventId))
-                .thenReturn(Optional.of(event));
+                .thenReturn(
+                        Optional.of(event)
+                );
 
         when(
-                requestCountProvider.hasConfirmedRequest(
-                        userId,
-                        eventId
-                )
+                requestCountProvider
+                        .hasConfirmedRequest(
+                                userId,
+                                eventId
+                        )
         ).thenReturn(false);
 
         assertThrows(
-                BadRequestException.class,
+                ConditionsNotMetException.class,
                 () -> eventService.likeEvent(
                         userId,
                         eventId
@@ -130,16 +144,21 @@ class EventServiceImplLikeActionTest {
         long userId = 1L;
         long eventId = 2L;
 
-        Event event = Event.builder()
-                .id(eventId)
-                .state(EventState.PENDING)
-                .build();
+        Event event =
+                Event.builder()
+                        .id(eventId)
+                        .state(
+                                EventState.PENDING
+                        )
+                        .build();
 
         when(eventRepository.findById(eventId))
-                .thenReturn(Optional.of(event));
+                .thenReturn(
+                        Optional.of(event)
+                );
 
         assertThrows(
-                RuntimeException.class,
+                NotFoundException.class,
                 () -> eventService.likeEvent(
                         userId,
                         eventId

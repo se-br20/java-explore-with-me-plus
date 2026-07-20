@@ -12,7 +12,11 @@ import ru.practicum.ewm.comments.model.CommentStatus;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateCommentUserRequest {
-    @Size(max = 2000)
+
+    @Size(
+            min = 1,
+            max = 2000
+    )
     private String text;
 
     private CommentStatus status;

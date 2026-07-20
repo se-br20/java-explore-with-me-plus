@@ -14,9 +14,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NewCompilationDto {
-    private List<Long> events;  // список id событий для подборки
+    private List<Long> events;
 
-    private Boolean pinned;  // по умолчанию false
+    private Boolean pinned;
 
     @NotBlank
     @Size(min = 1, max = 50)

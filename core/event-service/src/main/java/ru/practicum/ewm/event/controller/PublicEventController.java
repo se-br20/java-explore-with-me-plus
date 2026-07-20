@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +16,6 @@ import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.paramDto.PublicUserEventParam;
 import ru.practicum.ewm.event.service.EventService;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.List;
 
@@ -45,7 +45,10 @@ public class PublicEventController {
         String clientIp =
                 extractClientIp(request);
 
-        param.setUri(request.getRequestURI());
+        param.setUri(
+                request.getRequestURI()
+        );
+
         param.setIp(clientIp);
 
         log.debug(
@@ -63,7 +66,10 @@ public class PublicEventController {
     @GetMapping("/recommendations")
     public List<EventShortDto> getRecommendations(
             @RequestHeader(X_EWM_USER_ID)
-            @Positive(message = "User id must be positive")
+            @Positive(
+                    message =
+                            "User id must be positive"
+            )
             Long userId
     ) {
         log.debug(
@@ -72,14 +78,19 @@ public class PublicEventController {
                 userId
         );
 
-        return eventService.getRecommendations(userId);
+        return eventService
+                .getRecommendations(userId);
     }
 
     @PutMapping("/{eventId}/like")
     public void likeEvent(
             @PathVariable Long eventId,
+
             @RequestHeader(X_EWM_USER_ID)
-            @Positive(message = "User id must be positive")
+            @Positive(
+                    message =
+                            "User id must be positive"
+            )
             Long userId
     ) {
         log.debug(
@@ -98,9 +109,17 @@ public class PublicEventController {
     @GetMapping("/{id}")
     public EventFullDto getEvent(
             @PathVariable long id,
-            @RequestHeader(X_EWM_USER_ID)
-            @Positive(message = "User id must be positive")
-            long userId,
+
+            @RequestHeader(
+                    value = X_EWM_USER_ID,
+                    required = false
+            )
+            @Positive(
+                    message =
+                            "User id must be positive"
+            )
+            Long userId,
+
             HttpServletRequest request
     ) {
         String clientIp =
@@ -128,7 +147,9 @@ public class PublicEventController {
             HttpServletRequest request
     ) {
         String forwardedFor =
-                request.getHeader(X_FORWARDED_FOR);
+                request.getHeader(
+                        X_FORWARDED_FOR
+                );
 
         if (forwardedFor != null
                 && !forwardedFor.isBlank()) {
@@ -139,7 +160,9 @@ public class PublicEventController {
         }
 
         String realIp =
-                request.getHeader(X_REAL_IP);
+                request.getHeader(
+                        X_REAL_IP
+                );
 
         if (realIp != null
                 && !realIp.isBlank()) {

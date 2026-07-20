@@ -44,6 +44,3 @@ kafka:
   groups:
     user-actions: analyzer-user-actions-test
     events-similarity: analyzer-events-similarity-test
-
-recommendations:
-  recent-actions-limit: 5

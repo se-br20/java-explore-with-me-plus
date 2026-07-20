@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Location {
     @Column(name = "lat")
-    private Float lat;  // широта
+    private Float lat;
 
     @Column(name = "lon")
-    private Float lon;  // долгота
+    private Float lon;
 }
