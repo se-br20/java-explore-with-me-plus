@@ -29,14 +29,14 @@ class StatsIntegrationTest {
         LocalDateTime now = LocalDateTime.now();
 
         EndpointHitDto hit1 = EndpointHitDto.builder()
-                .app("ewm-service")
+                .app("ewm-event-service")
                 .uri("/events/1")
                 .ip("192.168.0.1")
                 .timestamp(now.minusHours(1))
                 .build();
 
         EndpointHitDto hit2 = EndpointHitDto.builder()
-                .app("ewm-service")
+                .app("ewm-event-service")
                 .uri("/events/1")
                 .ip("192.168.0.2")
                 .timestamp(now.minusMinutes(30))
@@ -63,14 +63,14 @@ class StatsIntegrationTest {
         LocalDateTime now = LocalDateTime.now();
 
         EndpointHitDto hit1 = EndpointHitDto.builder()
-                .app("ewm-service")
+                .app("ewm-event-service")
                 .uri("/events/2")
                 .ip("10.0.0.1")
                 .timestamp(now.minusHours(1))
                 .build();
 
         EndpointHitDto hit2 = EndpointHitDto.builder()
-                .app("ewm-service")
+                .app("ewm-event-service")
                 .uri("/events/2")
                 .ip("10.0.0.1") // тот же IP
                 .timestamp(now.minusMinutes(30))
@@ -97,14 +97,14 @@ class StatsIntegrationTest {
         LocalDateTime now = LocalDateTime.now();
 
         statsService.saveHit(EndpointHitDto.builder()
-                .app("ewm-service")
+                .app("ewm-event-service")
                 .uri("/events/1")
                 .ip("1.1.1.1")
                 .timestamp(now)
                 .build());
 
         statsService.saveHit(EndpointHitDto.builder()
-                .app("ewm-service")
+                .app("ewm-event-service")
                 .uri("/events/2")
                 .ip("2.2.2.2")
                 .timestamp(now)

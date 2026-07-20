@@ -4,26 +4,50 @@ server:
 
 spring:
   cloud:
+    loadbalancer:
+      cache:
+        enabled: false
+
     gateway:
       routes:
-        - id: main-service-route
-          uri: lb://main-service
+        - id: comment-service-route
+          uri: lb://comment-service
+          order: -40
           predicates:
-            - Path=/events/**,/categories/**,/compilations/**,/users/**,/admin/**,/comments/**
+            - Path=/admin/comments,/admin/comments/**,/users/*/comments,/users/*/comments/**,/events/*/comments,/events/*/comments/**,/comments/**
+
+        - id: request-service-route
+          uri: lb://request-service
+          order: -30
+          predicates:
+            - Path=/users/*/requests,/users/*/requests/**,/users/*/events/*/requests,/users/*/events/*/requests/**
+
+        - id: event-service-route
+          uri: lb://event-service
+          order: -20
+          predicates:
+            - Path=/events,/events/**,/categories,/categories/**,/compilations,/compilations/**,/admin/events,/admin/events/**,/admin/categories,/admin/categories/**,/admin/compilations,/admin/compilations/**,/users/*/events,/users/*/events/**
+
+        - id: user-service-route
+          uri: lb://user-service
+          order: -10
+          predicates:
+            - Path=/admin/users,/admin/users/**
 
 eureka:
   client:
     register-with-eureka: true
     fetch-registry: true
-
     registry-fetch-interval-seconds: ${EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS:3}
 
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
 
   instance:
-    instance-id: ${spring.application.name}:${server.port}:${random.value}
     prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:false}
+    instance-id: ${spring.application.name}:${server.port}:${random.value}
+    lease-renewal-interval-in-seconds: ${EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS:3}
+    lease-expiration-duration-in-seconds: ${EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS:10}
 
 management:
   endpoints:
