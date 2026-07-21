@@ -1,6 +1,10 @@
 package ru.practicum.ewm.event.service;
 
-import ru.practicum.ewm.event.dto.*;
+import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.dto.EventShortDto;
+import ru.practicum.ewm.event.dto.NewEventDto;
+import ru.practicum.ewm.event.dto.UpdateEventAdminRequest;
+import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.event.dto.paramDto.AdminUserEventParam;
 import ru.practicum.ewm.event.dto.paramDto.PublicUserEventParam;
 
@@ -8,20 +12,6 @@ import java.util.Collection;
 import java.util.List;
 
 public interface EventService {
-
-    List<EventShortDto> getEventsForPublicRequests(
-            PublicUserEventParam param
-    );
-
-    List<EventFullDto> getEventsForAdminRequests(
-            AdminUserEventParam param
-    );
-
-    EventFullDto findEventById(
-            String uri,
-            String ip,
-            Long id
-    );
 
     EventFullDto createEvent(
             Long userId,
@@ -32,6 +22,23 @@ public interface EventService {
             Long userId,
             int from,
             int size
+    );
+
+    List<EventShortDto> getEventsForPublicRequests(
+            PublicUserEventParam userEventParam
+    );
+
+    List<EventShortDto> getRecommendations(
+            Long userId
+    );
+
+    void likeEvent(
+            Long userId,
+            Long eventId
+    );
+
+    List<EventFullDto> getEventsForAdminRequests(
+            AdminUserEventParam adminParam
     );
 
     EventFullDto findUserEventByEventId(
@@ -48,6 +55,13 @@ public interface EventService {
     EventFullDto updateEvent(
             Long eventId,
             UpdateEventAdminRequest body
+    );
+
+    EventFullDto findEventById(
+            String uri,
+            String ip,
+            long id,
+            long userId
     );
 
     List<EventShortDto> getShortDtosByIds(

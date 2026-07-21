@@ -32,12 +32,11 @@ public class EventShortDto implements EventCountsAware {
     private Boolean paid;
 
     @JsonIgnore
-
     private LocalDateTime publishedOn;
 
     private String title;
 
-    private Long views;
+    private Double rating;
 
     private Long commentsCount;
 

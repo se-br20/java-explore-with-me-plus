@@ -18,10 +18,6 @@ public class CommentCountProvider {
 
     private final CommentServiceClient commentServiceClient;
 
-    /**
-     * Получает количество одобренных комментариев
-     * для всего списка событий одним HTTP-запросом.
-     */
     public void enrich(
             List<? extends EventCountsAware> eventDtos
     ) {
