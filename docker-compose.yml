@@ -384,6 +384,80 @@ services:
       retries: 40
       start_period: 20s
 
+  stats-db:
+    image: postgres:16.1
+    container_name: stats-db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: stats
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    volumes:
+      - stats-db-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -q -d "$$POSTGRES_DB" -U "$$POSTGRES_USER"
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  stats-server:
+    build:
+      context: ./stats-service/stats-server
+
+    container_name: stats-server
+    restart: on-failure
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+
+      config-server:
+        condition: service_healthy
+
+      stats-db:
+        condition: service_healthy
+
+    ports:
+      - "9090:9090"
+
+    environment:
+      SERVER_PORT: "9090"
+      SERVER_ADDRESS: "0.0.0.0"
+      SPRING_APPLICATION_NAME: stats-server
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: >-
+        http://discovery-server:8761/eureka/
+
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS: "3"
+      EUREKA_INSTANCE_LEASE_EXPIRATION_DURATION_IN_SECONDS: "10"
+
+      SPRING_DATASOURCE_URL: >-
+        jdbc:postgresql://stats-db:5432/stats
+
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          bash -ec 'exec 3<>/dev/tcp/127.0.0.1/9090;
+          printf "GET /actuator/health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3;
+          grep -q "\"status\":\"UP\"" <&3'
+
+      interval: 3s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+
   comment-service:
     build:
       context: ./core/comment-service
@@ -656,3 +730,4 @@ volumes:
   request-db-data:
   comment-db-data:
   analyzer-db-data:
+  stats-db-data:
