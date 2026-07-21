@@ -6,7 +6,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.categories.model.Category;
 import ru.practicum.ewm.categories.repository.CategoryRepository;
-import ru.practicum.ewm.event.dto.*;
+import ru.practicum.ewm.event.dto.EventCountsAware;
+import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.dto.EventMapper;
+import ru.practicum.ewm.event.dto.EventShortDto;
+import ru.practicum.ewm.event.dto.NewEventDto;
+import ru.practicum.ewm.event.dto.Rateable;
+import ru.practicum.ewm.event.dto.UpdateEventAdminRequest;
+import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
+import ru.practicum.ewm.event.dto.Viewable;
 import ru.practicum.ewm.event.dto.paramDto.AdminUserEventParam;
 import ru.practicum.ewm.event.dto.paramDto.EventRepositoryParam;
 import ru.practicum.ewm.event.dto.paramDto.PublicUserEventParam;
@@ -24,10 +32,21 @@ import ru.practicum.interaction.user.UserDetailsDto;
 import ru.practicum.stat.client.AnalyzerClient;
 import ru.practicum.stat.client.CollectorClient;
 import ru.practicum.stat.client.RecommendedEvent;
+import ru.practicum.stat.client.StatsClient;
 import ru.practicum.stat.client.UserActionType;
+import ru.practicum.stat.dto.EndpointHitDto;
+import ru.practicum.stat.dto.ParamDto;
+import ru.practicum.stat.dto.ViewStatsDto;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,6 +55,15 @@ import java.util.stream.Collectors;
 public class EventServiceImpl implements EventService {
 
     private static final int DEFAULT_RECOMMENDATION_LIMIT = 10;
+
+    private static final LocalDateTime STATS_EPOCH =
+            LocalDateTime.of(
+                    1970,
+                    1,
+                    1,
+                    0,
+                    0
+            );
 
     private static final Comparator<EventShortDto>
             RATING_ORDER =
@@ -65,6 +93,7 @@ public class EventServiceImpl implements EventService {
     private final AnalyzerClient analyzerClient;
     private final CommentCountProvider commentCountProvider;
     private final RequestCountProvider requestCountProvider;
+    private final StatsClient statsClient;
 
     @Override
     @Transactional
@@ -101,11 +130,16 @@ public class EventServiceImpl implements EventService {
 
         event = eventRepository.save(event);
 
-        return EventMapper.toEventFullDto(
-                event,
-                0L,
-                0.0
-        );
+        EventFullDto result =
+                EventMapper.toEventFullDto(
+                        event,
+                        0L,
+                        0.0
+                );
+
+        result.setViews(0L);
+
+        return result;
     }
 
     @Override
@@ -130,6 +164,7 @@ public class EventServiceImpl implements EventService {
         }
 
         enrichEventsWithRatings(events);
+        enrichEventsWithViews(events);
         enrichEventsListWithCounts(events);
 
         return events;
@@ -166,6 +201,11 @@ public class EventServiceImpl implements EventService {
                         : eventRepository
                         .findEventsShortDto(param);
 
+        sendLegacyHit(
+                userEventParam.getUri(),
+                userEventParam.getIp()
+        );
+
         if (repositoryResult.isEmpty()) {
             return repositoryResult;
         }
@@ -174,6 +214,7 @@ public class EventServiceImpl implements EventService {
                 new ArrayList<>(repositoryResult);
 
         enrichEventsWithRatings(events);
+        enrichEventsWithViews(events);
         enrichEventsListWithCounts(events);
 
         if (sortByRating) {
@@ -259,6 +300,7 @@ public class EventServiceImpl implements EventService {
                         .collect(Collectors.toList());
 
         enrichEventsWithRatings(result);
+        enrichEventsWithViews(result);
         enrichEventsListWithCounts(result);
 
         return result;
@@ -328,6 +370,7 @@ public class EventServiceImpl implements EventService {
         }
 
         enrichEventsWithRatings(events);
+        enrichEventsWithViews(events);
         enrichEventsListWithCounts(events);
 
         return events;
@@ -364,6 +407,7 @@ public class EventServiceImpl implements EventService {
         }
 
         enrichEventWithRating(event);
+        enrichEventWithViews(event);
         enrichEventsListWithCounts(List.of(event));
 
         return event;
@@ -493,6 +537,7 @@ public class EventServiceImpl implements EventService {
                         rating
                 );
 
+        enrichEventWithViews(eventFullDto);
         enrichEventsListWithCounts(
                 List.of(eventFullDto)
         );
@@ -607,6 +652,7 @@ public class EventServiceImpl implements EventService {
                         rating
                 );
 
+        enrichEventWithViews(eventFullDto);
         enrichEventsListWithCounts(
                 List.of(eventFullDto)
         );
@@ -619,8 +665,8 @@ public class EventServiceImpl implements EventService {
     public EventFullDto findEventById(
             String uri,
             String ip,
-            long id,
-            long userId
+            Long id,
+            Long userId
     ) {
         EventFullDto event =
                 eventRepository.findEventByIdFullDto(id)
@@ -640,15 +686,28 @@ public class EventServiceImpl implements EventService {
             );
         }
 
+        /*
+         * Старый REST-счётчик уникальных IP.
+         * Отправляется после проверки публикации.
+         */
+        sendLegacyHit(uri, ip);
+
+        /*
+         * Новое пользовательское действие VIEW.
+         * Для старого анонимного запроса оно не создаётся.
+         */
+        if (userId != null) {
+            collectorClient.sendAction(
+                    userId,
+                    id,
+                    UserActionType.VIEW
+            );
+        }
+
         enrichEventWithRating(event);
+        enrichEventWithViews(event);
         enrichEventsListWithCounts(
                 List.of(event)
-        );
-
-        collectorClient.sendAction(
-                userId,
-                id,
-                UserActionType.VIEW
         );
 
         return event;
@@ -695,6 +754,7 @@ public class EventServiceImpl implements EventService {
                         .collect(Collectors.toList());
 
         enrichEventsWithRatings(eventDtos);
+        enrichEventsWithViews(eventDtos);
         enrichEventsListWithCounts(eventDtos);
 
         return eventDtos;
@@ -876,6 +936,10 @@ public class EventServiceImpl implements EventService {
 
         int safeFrom = Math.max(from, 0);
 
+        if (safeFrom >= values.size()) {
+            return Collections.emptyList();
+        }
+
         long requestedEnd =
                 (long) safeFrom + size;
 
@@ -891,5 +955,215 @@ public class EventServiceImpl implements EventService {
                         toIndex
                 )
         );
+    }
+
+    private <T extends Viewable>
+    void enrichEventsWithViews(
+            List<T> events
+    ) {
+        if (events == null || events.isEmpty()) {
+            return;
+        }
+
+        LocalDateTime minPublishedOn =
+                events.stream()
+                        .map(Viewable::getPublishedOn)
+                        .filter(Objects::nonNull)
+                        .min(LocalDateTime::compareTo)
+                        .orElse(null);
+
+        String[] uris =
+                events.stream()
+                        .map(Viewable::getId)
+                        .filter(Objects::nonNull)
+                        .map(id -> "/events/" + id)
+                        .toArray(String[]::new);
+
+        Map<Long, Long> views =
+                fetchViews(
+                        uris,
+                        minPublishedOn
+                );
+
+        events.forEach(event ->
+                event.setViews(
+                        views.getOrDefault(
+                                event.getId(),
+                                0L
+                        )
+                )
+        );
+    }
+
+    private void enrichEventWithViews(
+            EventFullDto event
+    ) {
+        if (event == null || event.getId() == null) {
+            return;
+        }
+
+        String[] uris = {
+                "/events/" + event.getId()
+        };
+
+        Map<Long, Long> views =
+                fetchViews(
+                        uris,
+                        event.getPublishedOn()
+                );
+
+        event.setViews(
+                views.getOrDefault(
+                        event.getId(),
+                        0L
+                )
+        );
+    }
+
+    private Map<Long, Long> fetchViews(
+            String[] uris,
+            LocalDateTime publishedOn
+    ) {
+        if (uris == null || uris.length == 0) {
+            return Collections.emptyMap();
+        }
+
+        LocalDateTime start =
+                publishedOn == null
+                        ? STATS_EPOCH
+                        : publishedOn.truncatedTo(
+                        ChronoUnit.SECONDS
+                );
+
+        LocalDateTime end =
+                LocalDateTime.now()
+                        .plusSeconds(1)
+                        .truncatedTo(
+                                ChronoUnit.SECONDS
+                        );
+
+        ParamDto param =
+                ParamDto.builder()
+                        .start(start)
+                        .end(end)
+                        .uris(uris)
+                        .unique(true)
+                        .build();
+
+        try {
+            List<ViewStatsDto> statistics =
+                    statsClient.get(param);
+
+            if (statistics == null
+                    || statistics.isEmpty()) {
+
+                return Collections.emptyMap();
+            }
+
+            return statistics.stream()
+                    .filter(Objects::nonNull)
+                    .filter(stat -> stat.getUri() != null)
+                    .filter(stat -> stat.getHits() != null)
+                    .filter(stat -> stat.getHits() >= 0)
+                    .filter(stat ->
+                            isEventDetailsUri(
+                                    stat.getUri()
+                            )
+                    )
+                    .collect(
+                            Collectors.toMap(
+                                    this::extractEventId,
+                                    ViewStatsDto::getHits,
+                                    Long::sum
+                            )
+                    );
+
+        } catch (Exception exception) {
+            log.error(
+                    "Failed to fetch legacy views: uris={}",
+                    List.of(uris),
+                    exception
+            );
+
+            return Collections.emptyMap();
+        }
+    }
+
+    private boolean isEventDetailsUri(
+            String uri
+    ) {
+        if (uri == null
+                || !uri.startsWith("/events/")) {
+
+            return false;
+        }
+
+        String idPart =
+                uri.substring(
+                        uri.lastIndexOf('/') + 1
+                );
+
+        if (idPart.isBlank()) {
+            return false;
+        }
+
+        return idPart.chars()
+                .allMatch(Character::isDigit);
+    }
+
+    private Long extractEventId(
+            ViewStatsDto statistics
+    ) {
+        String uri = statistics.getUri();
+
+        return Long.parseLong(
+                uri.substring(
+                        uri.lastIndexOf('/') + 1
+                )
+        );
+    }
+
+    private void sendLegacyHit(
+            String uri,
+            String ip
+    ) {
+        if (uri == null
+                || uri.isBlank()
+                || ip == null
+                || ip.isBlank()) {
+
+            log.warn(
+                    "Legacy hit was not sent because "
+                            + "uri or ip is empty: uri={}, ip={}",
+                    uri,
+                    ip
+            );
+
+            return;
+        }
+
+        EndpointHitDto hit =
+                EndpointHitDto.builder()
+                        .uri(uri)
+                        .ip(ip)
+                        .timestamp(
+                                LocalDateTime.now()
+                                        .truncatedTo(
+                                                ChronoUnit.SECONDS
+                                        )
+                        )
+                        .build();
+
+        try {
+            statsClient.hit(hit);
+        } catch (Exception exception) {
+            log.error(
+                    "Failed to send legacy hit: "
+                            + "uri={}, ip={}",
+                    uri,
+                    ip,
+                    exception
+            );
+        }
     }
 }

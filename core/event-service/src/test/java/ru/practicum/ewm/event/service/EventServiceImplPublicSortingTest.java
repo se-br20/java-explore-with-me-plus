@@ -14,6 +14,8 @@ import ru.practicum.ewm.interaction.client.UserServiceClient;
 import ru.practicum.stat.client.AnalyzerClient;
 import ru.practicum.stat.client.CollectorClient;
 import ru.practicum.stat.client.RecommendedEvent;
+import ru.practicum.stat.client.StatsClient;
+import ru.practicum.stat.dto.ParamDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,6 +32,7 @@ class EventServiceImplPublicSortingTest {
 
     private EventRepository eventRepository;
     private AnalyzerClient analyzerClient;
+    private StatsClient statsClient;
     private EventServiceImpl eventService;
 
     @BeforeEach
@@ -40,6 +43,19 @@ class EventServiceImplPublicSortingTest {
         analyzerClient =
                 mock(AnalyzerClient.class);
 
+        statsClient =
+                mock(StatsClient.class);
+
+        /*
+         * В этом тесте просмотры не проверяются.
+         * Возвращаем пустую статистику, чтобы views стало 0.
+         */
+        when(
+                statsClient.get(
+                        any(ParamDto.class)
+                )
+        ).thenReturn(List.of());
+
         eventService =
                 new EventServiceImpl(
                         eventRepository,
@@ -48,7 +64,8 @@ class EventServiceImplPublicSortingTest {
                         mock(CollectorClient.class),
                         analyzerClient,
                         mock(CommentCountProvider.class),
-                        mock(RequestCountProvider.class)
+                        mock(RequestCountProvider.class),
+                        mock(StatsClient.class)
                 );
     }
 
@@ -131,7 +148,6 @@ class EventServiceImplPublicSortingTest {
             Long id,
             long dayOffset
     ) {
-
         LocalDateTime eventDate =
                 LocalDateTime.of(
                                 2027,
@@ -145,7 +161,17 @@ class EventServiceImplPublicSortingTest {
         return EventShortDto.builder()
                 .id(id)
                 .eventDate(eventDate)
+                .publishedOn(
+                        LocalDateTime.of(
+                                2026,
+                                1,
+                                1,
+                                12,
+                                0
+                        )
+                )
                 .rating(0.0)
+                .views(0L)
                 .confirmedRequests(0L)
                 .commentsCount(0L)
                 .build();

@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventFullDto implements EventCountsAware {
+public class EventFullDto implements EventCountsAware, Rateable, Viewable {
     private Long id;
 
     @NotBlank
@@ -61,5 +61,8 @@ public class EventFullDto implements EventCountsAware {
     private Double rating;
 
     private Long commentsCount;
+
+    @Builder.Default
+    private Long views = 0L;
 
 }

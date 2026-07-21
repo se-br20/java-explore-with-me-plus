@@ -174,6 +174,7 @@ public final class EventMapper {
                 .title(event.getTitle())
                 .rating(rating)
                 .commentsCount(0L)
+                .views(0L)
                 .build();
     }
 
@@ -203,6 +204,7 @@ public final class EventMapper {
                 .title(event.getTitle())
                 .rating(rating)
                 .commentsCount(0L)
+                .views(0L)
                 .build();
     }
 

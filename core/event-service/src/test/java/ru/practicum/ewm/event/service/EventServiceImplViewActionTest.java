@@ -14,6 +14,8 @@ import ru.practicum.stat.client.AnalyzerClient;
 import ru.practicum.stat.client.CollectorClient;
 import ru.practicum.stat.client.RecommendedEvent;
 import ru.practicum.stat.client.UserActionType;
+import ru.practicum.stat.client.StatsClient;
+import ru.practicum.stat.dto.ParamDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -37,6 +40,16 @@ class EventServiceImplViewActionTest {
 
     @BeforeEach
     void setUp() {
+
+        StatsClient statsClient =
+                mock(StatsClient.class);
+
+        when(
+                statsClient.get(
+                        any(ParamDto.class)
+                )
+        ).thenReturn(List.of());
+
         eventRepository =
                 mock(EventRepository.class);
 
@@ -71,16 +84,16 @@ class EventServiceImplViewActionTest {
                 )
         );
 
-        eventService =
-                new EventServiceImpl(
-                        eventRepository,
-                        userServiceClient,
-                        categoryRepository,
-                        collectorClient,
-                        analyzerClient,
-                        commentCountProvider,
-                        requestCountProvider
-                );
+        eventService = new EventServiceImpl(
+                eventRepository,
+                userServiceClient,
+                categoryRepository,
+                collectorClient,
+                analyzerClient,
+                commentCountProvider,
+                requestCountProvider,
+                mock(StatsClient.class)
+        );
     }
 
     @Test
