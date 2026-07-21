@@ -2,7 +2,7 @@ package ru.practicum.ewm.comments.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.comments.client.EventServiceClient;
@@ -15,6 +15,7 @@ import ru.practicum.ewm.comments.dto.UpdateCommentAdminRequest;
 import ru.practicum.ewm.comments.dto.UpdateCommentUserRequest;
 import ru.practicum.ewm.comments.model.Comment;
 import ru.practicum.ewm.comments.model.CommentStatus;
+import ru.practicum.ewm.comments.pagination.OffsetBasedPageRequest;
 import ru.practicum.ewm.comments.repository.CommentRepository;
 import ru.practicum.ewm.exceptions.exceptions.ConditionsNotMetException;
 import ru.practicum.ewm.exceptions.exceptions.NotFoundException;
@@ -35,7 +36,8 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class CommentServiceImpl implements CommentService {
+public class CommentServiceImpl
+        implements CommentService {
 
     private final CommentRepository commentRepository;
     private final UserServiceClient userServiceClient;
@@ -47,16 +49,17 @@ public class CommentServiceImpl implements CommentService {
             int from,
             int size
     ) {
-        PageRequest page = PageRequest.of(
-                from / size,
-                size
-        );
+        Pageable pageable =
+                OffsetBasedPageRequest.of(
+                        from,
+                        size
+                );
 
         return commentRepository
                 .findByEventIdAndStatusOrderByCreatedDesc(
                         eventId,
                         CommentStatus.APPROVED,
-                        page
+                        pageable
                 )
                 .stream()
                 .map(CommentMapper::toShortDto)
@@ -64,19 +67,23 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentShortDto getComment(Long commentId) {
-        Comment comment = commentRepository
-                .findByIdAndStatus(
-                        commentId,
-                        CommentStatus.APPROVED
-                )
-                .orElseThrow(() ->
-                        new NotFoundException(
-                                "Comment with id="
-                                        + commentId
-                                        + " not found or not approved"
+    public CommentShortDto getComment(
+            Long commentId
+    ) {
+        Comment comment =
+                commentRepository
+                        .findByIdAndStatus(
+                                commentId,
+                                CommentStatus.APPROVED
                         )
-                );
+                        .orElseThrow(() ->
+                                new NotFoundException(
+                                        "Comment with id="
+                                                + commentId
+                                                + " not found "
+                                                + "or not approved"
+                                )
+                        );
 
         return CommentMapper.toShortDto(comment);
     }
@@ -94,17 +101,20 @@ public class CommentServiceImpl implements CommentService {
         EventDetailsDto event =
                 eventServiceClient.getEvent(eventId);
 
-        if (event.getState() != EventStateDto.PUBLISHED) {
+        if (event.getState()
+                != EventStateDto.PUBLISHED) {
+
             throw new ConditionsNotMetException(
                     "Cannot comment on unpublished event"
             );
         }
 
-        Comment comment = CommentMapper.toComment(
-                dto,
-                author,
-                event
-        );
+        Comment comment =
+                CommentMapper.toComment(
+                        dto,
+                        author,
+                        event
+                );
 
         return CommentMapper.toFullDto(
                 commentRepository.save(comment)
@@ -119,21 +129,23 @@ public class CommentServiceImpl implements CommentService {
             UpdateCommentUserRequest dto
     ) {
         if (dto.getStatus() != null
-                && dto.getStatus() != CommentStatus.DELETED) {
+                && dto.getStatus()
+                != CommentStatus.DELETED) {
 
             throw new ConditionsNotMetException(
                     "User can only set status to DELETED"
             );
         }
 
-        Comment comment = getExistingComment(commentId);
+        Comment comment =
+                getExistingComment(commentId);
 
         if (!Objects.equals(
                 comment.getAuthorId(),
                 userId
         )) {
             throw new ConditionsNotMetException(
-                    "Only author or admin can update comments"
+                    "Only author can update comment"
             );
         }
 
@@ -163,19 +175,25 @@ public class CommentServiceImpl implements CommentService {
             Long userId,
             Long commentId
     ) {
-        Comment comment = getExistingComment(commentId);
+        Comment comment =
+                getExistingComment(commentId);
 
         if (!Objects.equals(
                 comment.getAuthorId(),
                 userId
         )) {
             throw new ConditionsNotMetException(
-                    "Only author or admin can delete comments"
+                    "Only author can delete comment"
             );
         }
 
-        comment.setStatus(CommentStatus.DELETED);
-        comment.setUpdated(LocalDateTime.now());
+        comment.setStatus(
+                CommentStatus.DELETED
+        );
+
+        comment.setUpdated(
+                LocalDateTime.now()
+        );
 
         commentRepository.save(comment);
     }
@@ -186,15 +204,16 @@ public class CommentServiceImpl implements CommentService {
             int from,
             int size
     ) {
-        PageRequest page = PageRequest.of(
-                from / size,
-                size
-        );
+        Pageable pageable =
+                OffsetBasedPageRequest.of(
+                        from,
+                        size
+                );
 
         return commentRepository
                 .findByStatusOrderByCreatedAsc(
                         CommentStatus.PENDING,
-                        page
+                        pageable
                 )
                 .stream()
                 .map(CommentMapper::toFullDto)
@@ -208,10 +227,17 @@ public class CommentServiceImpl implements CommentService {
             Long commentId,
             UpdateCommentAdminRequest dto
     ) {
-        Comment comment = getExistingComment(commentId);
+        validateAdminStatus(
+                dto.getStatus()
+        );
+
+        Comment comment =
+                getExistingComment(commentId);
 
         UserDetailsDto moderator =
-                userServiceClient.getUser(moderatorId);
+                userServiceClient.getUser(
+                        moderatorId
+                );
 
         CommentMapper.updateCommentFromAdminRequest(
                 dto,
@@ -230,10 +256,13 @@ public class CommentServiceImpl implements CommentService {
             Long moderatorId,
             Long commentId
     ) {
-        Comment comment = getExistingComment(commentId);
+        Comment comment =
+                getExistingComment(commentId);
 
         UserDetailsDto moderator =
-                userServiceClient.getUser(moderatorId);
+                userServiceClient.getUser(
+                        moderatorId
+                );
 
         CommentMapper.adminDeleteComment(
                 comment,
@@ -253,19 +282,24 @@ public class CommentServiceImpl implements CommentService {
                 || request.getEventIds().isEmpty()) {
 
             return ApprovedCommentsResponse.builder()
-                    .approvedComments(Collections.emptyMap())
+                    .approvedComments(
+                            Collections.emptyMap()
+                    )
                     .build();
         }
 
-        List<Long> eventIds = request.getEventIds()
-                .stream()
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
+        List<Long> eventIds =
+                request.getEventIds()
+                        .stream()
+                        .filter(Objects::nonNull)
+                        .distinct()
+                        .toList();
 
         if (eventIds.isEmpty()) {
             return ApprovedCommentsResponse.builder()
-                    .approvedComments(Collections.emptyMap())
+                    .approvedComments(
+                            Collections.emptyMap()
+                    )
                     .build();
         }
 
@@ -276,16 +310,22 @@ public class CommentServiceImpl implements CommentService {
                                 CommentStatus.APPROVED
                         );
 
-        Map<Long, Long> counts = new LinkedHashMap<>();
+        Map<Long, Long> counts =
+                new LinkedHashMap<>();
 
         for (Object[] row : rows) {
             Long eventId =
-                    ((Number) row[0]).longValue();
+                    ((Number) row[0])
+                            .longValue();
 
             Long count =
-                    ((Number) row[1]).longValue();
+                    ((Number) row[1])
+                            .longValue();
 
-            counts.put(eventId, count);
+            counts.put(
+                    eventId,
+                    count
+            );
         }
 
         return ApprovedCommentsResponse.builder()
@@ -293,7 +333,31 @@ public class CommentServiceImpl implements CommentService {
                 .build();
     }
 
-    private Comment getExistingComment(Long commentId) {
+    private void validateAdminStatus(
+            CommentStatus status
+    ) {
+        if (status == null) {
+            return;
+        }
+
+        boolean allowed =
+                status == CommentStatus.APPROVED
+                        || status
+                        == CommentStatus.REJECTED
+                        || status
+                        == CommentStatus.DELETED;
+
+        if (!allowed) {
+            throw new ConditionsNotMetException(
+                    "Admin can only set comment status "
+                            + "to APPROVED, REJECTED or DELETED"
+            );
+        }
+    }
+
+    private Comment getExistingComment(
+            Long commentId
+    ) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() ->
                         new NotFoundException(

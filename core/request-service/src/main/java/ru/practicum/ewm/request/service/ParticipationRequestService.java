@@ -40,4 +40,9 @@ public interface ParticipationRequestService {
     ConfirmedRequestsResponse getConfirmedRequestCounts(
             EventIdsRequest request
     );
+
+    boolean hasConfirmedRequest(
+            Long userId,
+            Long eventId
+    );
 }

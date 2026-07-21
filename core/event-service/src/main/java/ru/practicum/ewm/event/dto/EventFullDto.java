@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventFullDto implements EventCountsAware {
+public class EventFullDto implements EventCountsAware, Rateable, Viewable {
     private Long id;
 
     @NotBlank
@@ -27,7 +27,7 @@ public class EventFullDto implements EventCountsAware {
 
     private CategoryDto category;
 
-    private Long confirmedRequests;  // из таблицы запросов на участие
+    private Long confirmedRequests;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdOn;
@@ -58,8 +58,11 @@ public class EventFullDto implements EventCountsAware {
     @Size(min = 3, max = 120)
     private String title;
 
-    private Long views;  // из сервиса статистики
+    private Double rating;
 
     private Long commentsCount;
+
+    @Builder.Default
+    private Long views = 0L;
 
 }

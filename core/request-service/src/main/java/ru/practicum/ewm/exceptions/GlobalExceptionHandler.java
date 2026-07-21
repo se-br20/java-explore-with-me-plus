@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // отлов ошибок валидации из контроллера от параметров с аннотацией @RequestBody @Valid
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
@@ -54,7 +53,6 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
-    // обработка ValidationException в кастомынх аннотациях - пока их нет, но потом может добавим, смотря что там по заданию
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleValidationException(ValidationException ex) {
@@ -72,7 +70,6 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
-    // Обработка ограничений в SQL, например UNIQUE на поле email у юзера.
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleDataIntegrityViolation(DataIntegrityViolationException ex) {
@@ -87,13 +84,11 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
-    // отлавливаем ошибки валидации @RequestParam параметров в методах контроллера
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleConstraintViolation(ConstraintViolationException ex) {
         log.warn("Constraint violation: {}", ex.getMessage());
 
-        // Собираем все в одну строку, т.к. там может быть много нарушений сразу
         String message = ex.getConstraintViolations().stream()
                 .map(violation -> {
                     String paramName = violation.getPropertyPath().toString();
@@ -113,7 +108,6 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
-    // отлов ошибок, когда в @PathVariable приходят некорректные данные, которые спринг не может преобразовать (текст вместо числа)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
@@ -127,7 +121,6 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
-    // сущность не найдена
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleNotFoundException(NotFoundException ex) {

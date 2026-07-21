@@ -23,6 +23,12 @@ public interface ParticipationRequestRepository
             Long requesterId
     );
 
+    boolean existsByEventIdAndRequesterIdAndStatus(
+            Long eventId,
+            Long requesterId,
+            RequestStatus status
+    );
+
     List<ParticipationRequest> findByRequesterId(
             Long requesterId
     );

@@ -1,19 +1,19 @@
 package ru.practicum.stat.client;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.retry.backoff.FixedBackOffPolicy;
-import org.springframework.retry.policy.MaxAttemptsRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import ru.practicum.stat.client.exception.StatsServerUnavailableException;
 import ru.practicum.stat.dto.EndpointHitDto;
 import ru.practicum.stat.dto.ParamDto;
 import ru.practicum.stat.dto.ViewStatsDto;
@@ -32,26 +32,26 @@ public class StatsClient {
     private static final DateTimeFormatter FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    private static final int MAX_ATTEMPTS = 3;
-    private static final long BACKOFF_PERIOD = 3000L;
-
-    private final RestTemplate template;
+    private final RestTemplate restTemplate;
     private final DiscoveryClient discoveryClient;
     private final RetryTemplate retryTemplate;
     private final String statsServiceId;
     private final String appName;
 
     public StatsClient(
-            RestTemplate template,
+            @Qualifier("statsRestTemplate")
+            RestTemplate restTemplate,
             DiscoveryClient discoveryClient,
+            @Qualifier("statsServerRetryTemplate")
+            RetryTemplate retryTemplate,
             @Value("${stats-server.service-id:stats-server}")
             String statsServiceId,
-            @Value("${app.name}")
+            @Value("${spring.application.name:event-service}")
             String appName
     ) {
-        this.template = template;
+        this.restTemplate = restTemplate;
         this.discoveryClient = discoveryClient;
-        this.retryTemplate = createRetryTemplate();
+        this.retryTemplate = retryTemplate;
         this.statsServiceId = statsServiceId;
         this.appName = appName;
     }
@@ -65,31 +65,19 @@ public class StatsClient {
                 .build();
 
         try {
-            URI targetUri = makeUri("/hit");
+            URI uri = makeUri("/hit");
 
-            HttpEntity<EndpointHitDto> requestEntity =
-                    new HttpEntity<>(requestBody);
-
-            template.exchange(
-                    targetUri,
+            restTemplate.exchange(
+                    uri,
                     POST,
-                    requestEntity,
+                    new HttpEntity<>(requestBody),
                     Void.class
-            );
-
-            log.debug(
-                    "Hit saved to {}: app={}, uri={}, ip={}, timestamp={}",
-                    targetUri,
-                    requestBody.getApp(),
-                    requestBody.getUri(),
-                    requestBody.getIp(),
-                    requestBody.getTimestamp()
             );
         } catch (RestClientException
                  | StatsServerUnavailableException exception) {
 
             log.warn(
-                    "Failed to save hit through service {}: {}",
+                    "Legacy stats hit was not sent: serviceId={}, reason={}",
                     statsServiceId,
                     exception.getMessage()
             );
@@ -101,7 +89,7 @@ public class StatsClient {
             URI uri = buildStatsUri(paramDto);
 
             ResponseEntity<List<ViewStatsDto>> response =
-                    template.exchange(
+                    restTemplate.exchange(
                             uri,
                             GET,
                             null,
@@ -110,20 +98,12 @@ public class StatsClient {
                     );
 
             List<ViewStatsDto> body = response.getBody();
-
-            log.debug(
-                    "Stats received: request={}, status={}, body={}",
-                    uri,
-                    response.getStatusCode(),
-                    body
-            );
-
-            return body != null ? body : List.of();
+            return body == null ? List.of() : body;
         } catch (RestClientException
                  | StatsServerUnavailableException exception) {
 
             log.warn(
-                    "Failed to receive stats through service {}: {}",
+                    "Legacy stats were not received: serviceId={}, reason={}",
                     statsServiceId,
                     exception.getMessage()
             );
@@ -133,20 +113,21 @@ public class StatsClient {
     }
 
     private URI buildStatsUri(ParamDto paramDto) {
-        UriComponentsBuilder builder = UriComponentsBuilder
-                .fromUri(makeUri("/stats"))
-                .queryParam(
-                        "start",
-                        paramDto.getStart().format(FORMATTER)
-                )
-                .queryParam(
-                        "end",
-                        paramDto.getEnd().format(FORMATTER)
-                )
-                .queryParam(
-                        "unique",
-                        Boolean.TRUE.equals(paramDto.getUnique())
-                );
+        UriComponentsBuilder builder =
+                UriComponentsBuilder
+                        .fromUri(makeUri("/stats"))
+                        .queryParam(
+                                "start",
+                                paramDto.getStart().format(FORMATTER)
+                        )
+                        .queryParam(
+                                "end",
+                                paramDto.getEnd().format(FORMATTER)
+                        )
+                        .queryParam(
+                                "unique",
+                                Boolean.TRUE.equals(paramDto.getUnique())
+                        );
 
         if (paramDto.getUris() != null) {
             for (String uri : paramDto.getUris()) {
@@ -154,83 +135,39 @@ public class StatsClient {
             }
         }
 
-        return builder
-                .build()
-                .encode()
-                .toUri();
+        return builder.build().encode().toUri();
     }
 
     private URI makeUri(String path) {
+        ServiceInstance instance =
+                retryTemplate.execute(context -> getInstance());
 
-        ServiceInstance instance = retryTemplate.execute(
-                context -> getInstance()
-        );
-
-        return URI.create(
-                "http://"
-                        + instance.getHost()
-                        + ":"
-                        + instance.getPort()
-                        + path
-        );
+        return UriComponentsBuilder
+                .fromUri(instance.getUri())
+                .path(path)
+                .build()
+                .toUri();
     }
 
     private ServiceInstance getInstance() {
+        List<ServiceInstance> instances;
+
         try {
-            List<ServiceInstance> instances =
+            instances =
                     discoveryClient.getInstances(statsServiceId);
-
-            if (instances.isEmpty()) {
-                throw new StatsServerUnavailableException(
-                        "No instances found for service: "
-                                + statsServiceId
-                );
-            }
-
-            return instances.get(0);
-        } catch (StatsServerUnavailableException exception) {
-            throw exception;
         } catch (RuntimeException exception) {
             throw new StatsServerUnavailableException(
-                    "Failed to discover service: "
-                            + statsServiceId,
+                    "Failed to discover stats-server",
                     exception
             );
         }
-    }
 
-    private static RetryTemplate createRetryTemplate() {
-        RetryTemplate retryTemplate = new RetryTemplate();
-
-        FixedBackOffPolicy backOffPolicy =
-                new FixedBackOffPolicy();
-
-        backOffPolicy.setBackOffPeriod(BACKOFF_PERIOD);
-        retryTemplate.setBackOffPolicy(backOffPolicy);
-
-        MaxAttemptsRetryPolicy retryPolicy =
-                new MaxAttemptsRetryPolicy();
-
-        retryPolicy.setMaxAttempts(MAX_ATTEMPTS);
-        retryTemplate.setRetryPolicy(retryPolicy);
-
-        return retryTemplate;
-    }
-
-    private static final class StatsServerUnavailableException
-            extends RuntimeException {
-
-        private static final long serialVersionUID = 1L;
-
-        private StatsServerUnavailableException(String message) {
-            super(message);
+        if (instances.isEmpty()) {
+            throw new StatsServerUnavailableException(
+                    "No stats-server instances found"
+            );
         }
 
-        private StatsServerUnavailableException(
-                String message,
-                Throwable cause
-        ) {
-            super(message, cause);
-        }
+        return instances.getFirst();
     }
 }
