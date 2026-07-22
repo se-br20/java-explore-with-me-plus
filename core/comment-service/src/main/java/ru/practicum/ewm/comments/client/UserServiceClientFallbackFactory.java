@@ -10,8 +10,7 @@ import ru.practicum.interaction.user.UserDetailsDto;
 
 @Slf4j
 @Component
-public class UserServiceClientFallbackFactory
-        implements FallbackFactory<UserServiceClient> {
+public class UserServiceClientFallbackFactory implements FallbackFactory<UserServiceClient> {
 
     @Override
     public UserServiceClient create(Throwable cause) {

@@ -8,8 +8,7 @@ import ru.practicum.ewm.stats.avro.EventSimilarityAvro;
 
 import java.io.IOException;
 
-public class EventSimilarityAvroDeserializer
-        implements Deserializer<EventSimilarityAvro> {
+public class EventSimilarityAvroDeserializer implements Deserializer<EventSimilarityAvro> {
 
     @Override
     public EventSimilarityAvro deserialize(

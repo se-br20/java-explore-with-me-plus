@@ -117,7 +117,7 @@ public class EventServiceImpl implements EventService {
                 userServiceClient.getUser(userId);
 
         Category category =
-                categoryRepository.getCategory(
+                getCategoryOrThrow(
                         newEventDto.getCategory()
                 );
 
@@ -506,7 +506,7 @@ public class EventServiceImpl implements EventService {
 
         if (body.getCategory() != null) {
             category =
-                    categoryRepository.getCategory(
+                    getCategoryOrThrow(
                             body.getCategory()
                     );
         }
@@ -565,7 +565,7 @@ public class EventServiceImpl implements EventService {
 
         if (body.getCategory() != null) {
             category =
-                    categoryRepository.getCategory(
+                    getCategoryOrThrow(
                             body.getCategory()
                     );
         }
@@ -686,16 +686,8 @@ public class EventServiceImpl implements EventService {
             );
         }
 
-        /*
-         * Старый REST-счётчик уникальных IP.
-         * Отправляется после проверки публикации.
-         */
         sendLegacyHit(uri, ip);
 
-        /*
-         * Новое пользовательское действие VIEW.
-         * Для старого анонимного запроса оно не создаётся.
-         */
         if (userId != null) {
             collectorClient.sendAction(
                     userId,
@@ -936,10 +928,6 @@ public class EventServiceImpl implements EventService {
 
         int safeFrom = Math.max(from, 0);
 
-        if (safeFrom >= values.size()) {
-            return Collections.emptyList();
-        }
-
         long requestedEnd =
                 (long) safeFrom + size;
 
@@ -1165,5 +1153,19 @@ public class EventServiceImpl implements EventService {
                     exception
             );
         }
+    }
+
+    private Category getCategoryOrThrow(
+            Long categoryId
+    ) {
+        return categoryRepository
+                .findById(categoryId)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                "Category with id="
+                                        + categoryId
+                                        + " was not found"
+                        )
+                );
     }
 }

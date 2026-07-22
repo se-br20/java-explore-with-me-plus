@@ -9,11 +9,7 @@ import ru.practicum.ewm.stats.analyzer.model.EventSimilarityId;
 import java.util.Collection;
 import java.util.List;
 
-public interface EventSimilarityRepository extends
-        JpaRepository<
-                EventSimilarityEntity,
-                EventSimilarityId
-                > {
+public interface EventSimilarityRepository extends JpaRepository<EventSimilarityEntity, EventSimilarityId> {
 
     @Query("""
             select similarity

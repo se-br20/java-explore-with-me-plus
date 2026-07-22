@@ -5,8 +5,7 @@ import org.springframework.data.domain.Sort;
 
 import java.util.Objects;
 
-public final class OffsetBasedPageRequest
-        implements Pageable {
+public final class OffsetBasedPageRequest implements Pageable {
 
     private final long offset;
     private final int pageSize;

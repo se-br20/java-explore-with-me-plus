@@ -25,8 +25,7 @@ public class StatsMapper {
     }
 
     public static ViewStatsDto toViewStatsDto(Object[] result) {
-        // result[0] - app, result[1] - uri, result[2] - hits
-        return ViewStatsDto.builder()
+          return ViewStatsDto.builder()
                 .app((String) result[0])
                 .uri((String) result[1])
                 .hits((Long) result[2])

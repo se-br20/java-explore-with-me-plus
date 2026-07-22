@@ -8,8 +8,7 @@ import ru.practicum.ewm.stats.avro.UserActionAvro;
 
 import java.io.IOException;
 
-public class UserActionAvroDeserializer
-        implements Deserializer<UserActionAvro> {
+public class UserActionAvroDeserializer implements Deserializer<UserActionAvro> {
 
     @Override
     public UserActionAvro deserialize(

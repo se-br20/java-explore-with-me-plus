@@ -13,7 +13,7 @@ import ru.practicum.ewm.request.model.RequestStatus;
 public class ParticipationRequestDto {
     private Long id;
     private String created;
-    private Long event;      // id события
-    private Long requester;  // id пользователя
+    private Long event;
+    private Long requester;
     private RequestStatus status;
 }

@@ -17,9 +17,7 @@ import java.util.function.Supplier;
 
 @GrpcService
 @RequiredArgsConstructor
-public class RecommendationsGrpcController extends
-        RecommendationsControllerGrpc
-                .RecommendationsControllerImplBase {
+public class RecommendationsGrpcController extends RecommendationsControllerGrpc.RecommendationsControllerImplBase {
 
     private final RecommendationService recommendationService;
 

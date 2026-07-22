@@ -9,8 +9,7 @@ import ru.practicum.ewm.stats.analyzer.model.UserActionId;
 import java.util.Collection;
 import java.util.List;
 
-public interface UserActionRepository extends
-        JpaRepository<UserActionEntity, UserActionId> {
+public interface UserActionRepository extends JpaRepository<UserActionEntity, UserActionId> {
 
     @Query("""
             select action

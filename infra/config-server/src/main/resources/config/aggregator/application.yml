@@ -6,7 +6,7 @@ spring:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 
     consumer:
-      group-id: aggregator-${random.uuid}
+      group-id: ${KAFKA_CONSUMER_GROUP_ID:aggregator-user-actions}
       auto-offset-reset: earliest
       enable-auto-commit: false
 

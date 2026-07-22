@@ -35,8 +35,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ParticipationRequestServiceImpl
-        implements ParticipationRequestService {
+public class ParticipationRequestServiceImpl implements ParticipationRequestService {
 
     private final ParticipationRequestRepository requestRepository;
     private final UserServiceClient userServiceClient;

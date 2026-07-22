@@ -16,8 +16,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Embeddable
-public class EventSimilarityId
-        implements Serializable {
+public class EventSimilarityId implements Serializable {
 
     @Column(name = "event_a", nullable = false)
     private Long eventA;

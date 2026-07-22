@@ -14,9 +14,7 @@ import ru.practicum.ewm.stats.proto.collector.UserActionProto;
 
 @GrpcService
 @RequiredArgsConstructor
-public class UserActionGrpcController extends
-        UserActionControllerGrpc
-                .UserActionControllerImplBase {
+public class UserActionGrpcController extends UserActionControllerGrpc.UserActionControllerImplBase {
 
     private final UserActionProducer producer;
 

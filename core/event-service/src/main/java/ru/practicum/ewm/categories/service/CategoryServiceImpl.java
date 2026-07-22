@@ -1,6 +1,8 @@
 package ru.practicum.ewm.categories.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.categories.dto.CategoryDto;
 import ru.practicum.ewm.categories.dto.CategoryMapper;
@@ -21,44 +23,98 @@ public class CategoryServiceImpl implements CategoryService {
     private final EventRepository eventRepository;
 
     @Override
-    public CategoryDto postCategory(NewCategoryDto newCategoryDto) {
-        Category category = CategoryMapper.toCategory(newCategoryDto);
-        return CategoryMapper.toCategoryDto(categoryRepository.postCategory(category));
+    public CategoryDto postCategory(
+            NewCategoryDto newCategoryDto
+    ) {
+        Category category =
+                CategoryMapper.toCategory(
+                        newCategoryDto
+                );
+
+        Category savedCategory =
+                categoryRepository.save(category);
+
+        return CategoryMapper.toCategoryDto(
+                savedCategory
+        );
     }
 
     @Override
     public void deleteCategory(Long catId) {
-        if (!categoryRepository.existsById(catId)) {
-            throw new NotFoundException("Категория с id = " + catId + " не найдена");
-        }
+        Category category =
+                getCategoryOrThrow(catId);
+
         if (eventRepository.existsByCategoryId(catId)) {
-            throw new ConditionsNotMetException("Есть события в этой категории, удалить нельзя");
+            throw new ConditionsNotMetException(
+                    "Category with id="
+                            + catId
+                            + " is not empty"
+            );
         }
-        categoryRepository.deleteCategory(catId);
+
+        categoryRepository.delete(category);
     }
 
     @Override
-    public CategoryDto patchCategory(Long catId, NewCategoryDto newCategoryDto) {
-        if (!categoryRepository.existsById(catId)) {
-            throw new NotFoundException("Категория с id = " + catId + " не найдена");
-        }
-        Category category = CategoryMapper.toCategory(newCategoryDto);
-        Category updated = categoryRepository.patchCategory(catId, category);
-        return CategoryMapper.toCategoryDto(updated);
+    public CategoryDto patchCategory(
+            Long catId,
+            NewCategoryDto newCategoryDto
+    ) {
+        Category category =
+                getCategoryOrThrow(catId);
+
+        category.setName(
+                newCategoryDto.getName()
+        );
+
+        Category updatedCategory =
+                categoryRepository.save(category);
+
+        return CategoryMapper.toCategoryDto(
+                updatedCategory
+        );
     }
 
     @Override
-    public List<CategoryDto> getCategories(int from, int size) {
-        return categoryRepository.getCategories(from, size).stream().map(CategoryMapper::toCategoryDto).toList();
+    public List<CategoryDto> getCategories(
+            int from,
+            int size
+    ) {
+        PageRequest pageRequest =
+                PageRequest.of(
+                        from / size,
+                        size,
+                        Sort.by(
+                                Sort.Direction.ASC,
+                                "id"
+                        )
+                );
+
+        return categoryRepository
+                .findAll(pageRequest)
+                .stream()
+                .map(CategoryMapper::toCategoryDto)
+                .toList();
     }
 
     @Override
     public CategoryDto getCategory(Long catId) {
-        if (!categoryRepository.existsById(catId)) {
-            throw new NotFoundException("Категория с id = " + catId + " не найдена");
-        }
-        return CategoryMapper.toCategoryDto(categoryRepository.getCategory(catId));
+        return CategoryMapper.toCategoryDto(
+                getCategoryOrThrow(catId)
+        );
     }
 
-
+    private Category getCategoryOrThrow(
+            Long catId
+    ) {
+        return categoryRepository
+                .findById(catId)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                "Category with id="
+                                        + catId
+                                        + " was not found"
+                        )
+                );
+    }
 }

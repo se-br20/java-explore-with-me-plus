@@ -19,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/events")
 public class AdminEventController {
+
     private final EventService eventService;
 
     @GetMapping

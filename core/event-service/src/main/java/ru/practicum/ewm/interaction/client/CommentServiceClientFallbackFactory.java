@@ -9,8 +9,7 @@ import java.util.Collections;
 
 @Slf4j
 @Component
-public class CommentServiceClientFallbackFactory
-        implements FallbackFactory<CommentServiceClient> {
+public class CommentServiceClientFallbackFactory implements FallbackFactory<CommentServiceClient> {
 
     @Override
     public CommentServiceClient create(Throwable cause) {

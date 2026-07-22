@@ -10,8 +10,7 @@ import java.util.Collections;
 
 @Slf4j
 @Component
-public class RequestServiceClientFallbackFactory
-        implements FallbackFactory<RequestServiceClient> {
+public class RequestServiceClientFallbackFactory implements FallbackFactory<RequestServiceClient> {
 
     @Override
     public RequestServiceClient create(Throwable cause) {

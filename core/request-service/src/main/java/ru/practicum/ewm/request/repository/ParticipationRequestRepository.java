@@ -10,8 +10,7 @@ import ru.practicum.ewm.request.model.RequestStatus;
 import java.util.Collection;
 import java.util.List;
 
-public interface ParticipationRequestRepository
-        extends JpaRepository<ParticipationRequest, Long> {
+public interface ParticipationRequestRepository extends JpaRepository<ParticipationRequest, Long> {
 
     long countByEventIdAndStatus(
             Long eventId,
