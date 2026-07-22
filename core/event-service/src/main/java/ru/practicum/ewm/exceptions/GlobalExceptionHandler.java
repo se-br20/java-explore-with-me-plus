@@ -17,6 +17,8 @@ import ru.practicum.ewm.exceptions.exceptions.NotFoundException;
 import ru.practicum.ewm.exceptions.exceptions.ServiceUnavailableException;
 import ru.practicum.ewm.exceptions.exceptions.ValidationException;
 import ru.practicum.ewm.exceptions.responseMessage.ApiError;
+import ru.practicum.ewm.exceptions.exceptions.BadRequestException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -89,7 +91,6 @@ public class GlobalExceptionHandler {
     public ApiError handleConstraintViolation(ConstraintViolationException ex) {
         log.warn("Constraint violation: {}", ex.getMessage());
 
-        // Собираем все в одну строку, т.к. там может быть много нарушений сразу
         String message = ex.getConstraintViolations().stream()
                 .map(violation -> {
                     String paramName = violation.getPropertyPath().toString();
@@ -133,6 +134,56 @@ public class GlobalExceptionHandler {
                 .reason("The required object was not found.")
                 .status(HttpStatus.NOT_FOUND.name())
                 .timestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .build();
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleBadRequestException(
+            BadRequestException exception
+    ) {
+        log.warn(
+                "Bad request: {}",
+                exception.getMessage()
+        );
+
+        return ApiError.builder()
+                .errors(Collections.emptyList())
+                .message(exception.getMessage())
+                .reason("Incorrectly made request.")
+                .status(HttpStatus.BAD_REQUEST.name())
+                .timestamp(
+                        LocalDateTime.now().format(
+                                DateTimeFormatter.ofPattern(
+                                        "yyyy-MM-dd HH:mm:ss"
+                                )
+                        )
+                )
+                .build();
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleMissingRequestHeaderException(
+            MissingRequestHeaderException exception
+    ) {
+        log.warn(
+                "Missing request header: {}",
+                exception.getMessage()
+        );
+
+        return ApiError.builder()
+                .errors(Collections.emptyList())
+                .message(exception.getMessage())
+                .reason("Incorrectly made request.")
+                .status(HttpStatus.BAD_REQUEST.name())
+                .timestamp(
+                        LocalDateTime.now().format(
+                                DateTimeFormatter.ofPattern(
+                                        "yyyy-MM-dd HH:mm:ss"
+                                )
+                        )
+                )
                 .build();
     }
 

@@ -30,7 +30,6 @@ public class CompilationMapper {
         }
 
         if (request.getEvents() != null) {
-        // т.к. связь многие-ко-многим, для создания записи в промеж. таблице достаточно просто id, без остальных полей.
             List<Event> newEvents = request.getEvents().stream()
                     .map(id -> Event.builder().id(id).build())
                     .toList();

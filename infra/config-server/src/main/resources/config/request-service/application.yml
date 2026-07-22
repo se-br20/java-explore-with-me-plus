@@ -3,6 +3,12 @@ server:
   address: 0.0.0.0
   forward-headers-strategy: framework
 
+grpc:
+  client:
+    collector:
+      address: discovery:///collector
+      negotiation-type: PLAINTEXT
+
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/requests}
@@ -91,6 +97,10 @@ management:
   endpoint:
     health:
       show-details: always
+
+  health:
+    grpcChannel:
+      enabled: false
 
 logging:
   level:

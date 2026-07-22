@@ -21,8 +21,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
-public class RequiredServicesReadinessFilter
-        implements GlobalFilter, Ordered {
+public class RequiredServicesReadinessFilter implements GlobalFilter, Ordered {
 
     private static final Logger log = LoggerFactory.getLogger(
             RequiredServicesReadinessFilter.class

@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: aggregator
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+
+    registry-fetch-interval-seconds: ${EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS:3}
+
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "!test"
+
+    import: "configserver:"
+
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: config-server
+
+      fail-fast: true
+
+      retry:
+        initial-interval: 1000
+        max-attempts: 20
+        max-interval: 5000
+        multiplier: 1.5

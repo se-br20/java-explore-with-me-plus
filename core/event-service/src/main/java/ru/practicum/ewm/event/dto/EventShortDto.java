@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventShortDto implements EventCountsAware {
+public class EventShortDto implements EventCountsAware, Rateable, Viewable {
+
     private Long id;
 
     private String annotation;
@@ -24,7 +25,10 @@ public class EventShortDto implements EventCountsAware {
 
     private Long confirmedRequests;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(
+            shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd HH:mm:ss"
+    )
     private LocalDateTime eventDate;
 
     private UserShortDto initiator;
@@ -32,13 +36,16 @@ public class EventShortDto implements EventCountsAware {
     private Boolean paid;
 
     @JsonIgnore
-
     private LocalDateTime publishedOn;
 
     private String title;
 
-    private Long views;
+    @Builder.Default
+    private Double rating = 0.0;
 
-    private Long commentsCount;
+    @Builder.Default
+    private Long commentsCount = 0L;
 
+    @Builder.Default
+    private Long views = 0L;
 }

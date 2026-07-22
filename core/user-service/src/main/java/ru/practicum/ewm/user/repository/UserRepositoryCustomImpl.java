@@ -35,7 +35,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
                         user.name))
                 .from(user)
                 .where(predicate)
-                .orderBy(user.id.asc()) // нужна какая-то сортировка? раз есть offset, то логично использовать сортировку
+                .orderBy(user.id.asc())
                 .offset(from)
                 .limit(size)
                 .fetch();

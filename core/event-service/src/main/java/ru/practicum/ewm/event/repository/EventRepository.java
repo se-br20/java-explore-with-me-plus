@@ -7,8 +7,7 @@ import ru.practicum.ewm.event.model.Event;
 import java.util.Collection;
 import java.util.List;
 
-public interface EventRepository
-        extends JpaRepository<Event, Long>, EventRepositoryCustom {
+public interface EventRepository extends JpaRepository<Event, Long>, EventRepositoryCustom {
 
     @EntityGraph(attributePaths = {"category"})
     List<Event> findAllByIdIn(Collection<Long> eventIds);

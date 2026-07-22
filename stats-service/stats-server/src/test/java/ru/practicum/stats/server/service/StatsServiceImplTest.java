@@ -39,7 +39,7 @@ class StatsServiceImplTest {
         end = LocalDateTime.of(2026, 12, 31, 23, 59);
 
         hitDto = EndpointHitDto.builder()
-                .app("event-service")
+                .app("ewm-main-service")
                 .uri("/events/1")
                 .ip("192.168.1.1")
                 .timestamp(LocalDateTime.now())
@@ -47,7 +47,7 @@ class StatsServiceImplTest {
 
         endpointHit = EndpointHit.builder()
                 .id(1L)
-                .app("event-service")
+                .app("ewm-main-service")
                 .uri("/events/1")
                 .ip("192.168.1.1")
                 .timestamp(LocalDateTime.now())
@@ -55,12 +55,12 @@ class StatsServiceImplTest {
 
         viewStatsList = List.of(
                 ViewStatsDto.builder()
-                        .app("event-service")
+                        .app("ewm-main-service")
                         .uri("/events/1")
                         .hits(10L)
                         .build(),
                 ViewStatsDto.builder()
-                        .app("event-service")
+                        .app("ewm-main-service")
                         .uri("/events/2")
                         .hits(5L)
                         .build()
@@ -95,7 +95,7 @@ class StatsServiceImplTest {
 
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals("event-service", result.get(0).getApp());
+        assertEquals("ewm-main-service", result.get(0).getApp());
         assertEquals("/events/1", result.get(0).getUri());
         assertEquals(10L, result.get(0).getHits());
 
@@ -119,7 +119,7 @@ class StatsServiceImplTest {
         List<String> uris = List.of("/events/1");
         List<ViewStatsDto> uniqueStats = List.of(
                 ViewStatsDto.builder()
-                        .app("event-service")
+                        .app("ewm-main-service")
                         .uri("/events/1")
                         .hits(3L)
                         .build()

@@ -53,6 +53,20 @@ public class RequestCountProvider {
                 .getOrDefault(eventId, 0L);
     }
 
+    public boolean hasConfirmedRequest(
+            Long userId,
+            Long eventId
+    ) {
+        if (userId == null || eventId == null) {
+            return false;
+        }
+
+        return requestServiceClient.hasConfirmedRequest(
+                userId,
+                eventId
+        );
+    }
+
     private Map<Long, Long> getCounts(
             Collection<Long> eventIds
     ) {

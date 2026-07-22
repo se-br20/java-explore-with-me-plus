@@ -10,8 +10,7 @@ import ru.practicum.interaction.event.EventDetailsDto;
 
 @Slf4j
 @Component
-public class EventServiceClientFallbackFactory
-        implements FallbackFactory<EventServiceClient> {
+public class EventServiceClientFallbackFactory implements FallbackFactory<EventServiceClient> {
 
     @Override
     public EventServiceClient create(Throwable cause) {

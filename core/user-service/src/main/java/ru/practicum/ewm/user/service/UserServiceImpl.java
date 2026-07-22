@@ -23,8 +23,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public UserDto createUser(NewUserRequest newUserRequest) {
-        // Email не проверяется на уникальность, т.к. отлавливается DataIntegrityViolationException при нарушении UNIQUE в БД
-        User user = userRepository.save(UserMapper.toUser(newUserRequest));
+         User user = userRepository.save(UserMapper.toUser(newUserRequest));
         log.info("Created user with id: {}", user.getId());
 
         return UserMapper.toUserDto(user);

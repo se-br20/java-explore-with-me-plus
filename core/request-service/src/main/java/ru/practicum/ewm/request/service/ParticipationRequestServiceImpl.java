@@ -23,6 +23,9 @@ import ru.practicum.interaction.request.ConfirmedRequestsResponse;
 import ru.practicum.interaction.request.EventIdsRequest;
 import ru.practicum.interaction.user.UserDetailsDto;
 
+import ru.practicum.stat.client.CollectorClient;
+import ru.practicum.stat.client.UserActionType;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,12 +35,12 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ParticipationRequestServiceImpl
-        implements ParticipationRequestService {
+public class ParticipationRequestServiceImpl implements ParticipationRequestService {
 
     private final ParticipationRequestRepository requestRepository;
     private final UserServiceClient userServiceClient;
     private final EventServiceClient eventServiceClient;
+    private final CollectorClient collectorClient;
 
     @Override
     @Transactional
@@ -110,6 +113,12 @@ public class ParticipationRequestServiceImpl
         }
 
         request = requestRepository.save(request);
+
+        collectorClient.sendAction(
+                userId,
+                eventId,
+                UserActionType.REGISTER
+        );
 
         return ParticipationRequestMapper.toParticipationRequestDto(
                 request
@@ -393,6 +402,23 @@ public class ParticipationRequestServiceImpl
         return ConfirmedRequestsResponse.builder()
                 .confirmedRequests(counts)
                 .build();
+    }
+
+    @Override
+    public boolean hasConfirmedRequest(
+            Long userId,
+            Long eventId
+    ) {
+        if (userId == null || eventId == null) {
+            return false;
+        }
+
+        return requestRepository
+                .existsByEventIdAndRequesterIdAndStatus(
+                        eventId,
+                        userId,
+                        RequestStatus.CONFIRMED
+                );
     }
 
     private void verifyEventInitiator(

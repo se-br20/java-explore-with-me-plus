@@ -1,7 +1,6 @@
 package ru.practicum.ewm.exceptions.exceptions;
 
-public class ServiceUnavailableException
-        extends RuntimeException {
+public class ServiceUnavailableException extends RuntimeException {
 
     public ServiceUnavailableException(String message) {
         super(message);
